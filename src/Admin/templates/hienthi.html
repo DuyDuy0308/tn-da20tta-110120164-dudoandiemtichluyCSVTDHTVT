@@ -1,0 +1,175 @@
+{% extends "main.html" %} 
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Thêm thư viện Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+</head>
+<body>
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+          <!-- Info boxes -->
+          <div class="row">
+            <div class="col-12 col-sm-6 col-md-3">
+              <div class="info-box">
+                <span class="info-box-icon bg-info elevation-1"><i class="fas fa-user"></i></span>
+  
+                <div class="info-box-content">
+                  <span class="info-box-text">Tổng số giảng viên</span>
+                  <span class="info-box-number">
+                    {{total_giangvien }}
+                    <small></small>
+                  </span>
+                </div>
+                <!-- /.info-box-content -->
+              </div>
+              <!-- /.info-box -->
+            </div>
+            <!-- /.col -->
+            <div class="col-12 col-sm-6 col-md-3">
+              <div class="info-box mb-3">
+                <span class="info-box-icon bg-danger elevation-1"><i class="fa-solid fa-book-open"></i></span>
+
+
+  
+                <div class="info-box-content">
+                  <span class="info-box-text">Số lượng ngành</span>
+                  <span class="info-box-number">{{total_Nganhdaotao}}</span>
+                </div>
+                <!-- /.info-box-content -->
+              </div>
+              <!-- /.info-box -->
+            </div>
+            <!-- /.col -->
+  
+            <!-- fix for small devices only -->
+            <div class="clearfix hidden-md-up"></div>
+  
+            <div class="col-12 col-sm-6 col-md-3">
+              <div class="info-box mb-3">
+                <span class="info-box-icon bg-success elevation-1"><i class="fas fa-shopping-cart"></i></span>
+  
+                <div class="info-box-content">
+                  <span class="info-box-text">Tổng số môn học</span>
+                  <span class="info-box-number">{{total_Monhoc}}</span>
+                </div>
+                <!-- /.info-box-content -->
+              </div>
+              <!-- /.info-box -->
+            </div>
+            <!-- /.col -->
+            <div class="col-12 col-sm-6 col-md-3">
+              <div class="info-box mb-3">
+                <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-users"></i></span>
+  
+                <div class="info-box-content">
+                  <span class="info-box-text">Tổng số sinh viên</span>
+                  <span class="info-box-number">{{ total_sinh_vien }}</span>
+                </div>
+                <!-- /.info-box-content -->
+              </div>
+              <!-- /.info-box -->
+            </div>
+            <!-- /.col -->
+          </div>
+          <!-- /.row -->
+          <div class="card-header" >
+            <h3 class="card-title">
+              <ul class="nav nav-pills ml-auto">
+                <li class="nav-item">
+                  <div class="nav-link active" href="#revenue-chart" data-toggle="tab">Số lượng sinh viên mỗi lớp</div>
+
+                </li> 
+              </ul>
+            </h3>
+            <canvas id="class-student-chart" height="50px"></canvas>
+          </div><!-- /.card-header -->
+      <!-- Custom tabs (Charts with tabs)-->
+        <div class="card-header" >
+          <h3 class="card-title">
+            <ul class="nav nav-pills ml-auto">
+              <li class="nav-item">
+                <div class="nav-link active" href="#revenue-chart" data-toggle="tab">Điểm hệ 4 cao nhất và thấp nhất</div>
+              </li> 
+            </ul>
+          </h3>
+          <div>
+          <form method="GET" action="{% url 'main' %}">
+            <div class="input-group">
+                <select class="form-control" name="class">
+                    {% for lop in ds_lop %}
+                        <option value="{{ lop.Ma_lop }}">{{ lop.Ten_lop }}</option>
+                    {% endfor %}
+                </select>
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">Tìm kiếm</button>
+                </div>
+            </div>
+        </form>
+      </div>
+      <div>
+          <canvas id="score-chart" height="50px"></canvas>
+        </div><!-- /.card-header -->
+       
+        </div><!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+      <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Biểu đồ số sinh viên trong mỗi lớp
+            var ctxClass = document.getElementById('class-student-chart').getContext('2d');
+            var classStudentChart = new Chart(ctxClass, {
+                type: 'bar',
+                data: {
+                    labels: {{ labels|safe }},
+                    datasets: [{
+                        label: 'Số sinh viên',
+                        data: {{ data|safe }},
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                        }
+                    }
+                }
+            });
+      
+            // Biểu đồ điểm hệ 4 cao nhất và thấp nhất
+            var ctxScore = document.getElementById('score-chart').getContext('2d');
+            var scoreChart = new Chart(ctxScore, {
+                type: 'line',
+                data: {
+                    labels: {{ score_labels|safe }},
+                    datasets: [{
+                        label: 'Điểm hệ 4',
+                        data: {{ score_data|safe }},
+                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 1,
+                            max: 4,
+                             
+                        }
+                    }
+                }
+            });
+        });
+      </script>
+      
+</body>
+</html>
+{% endblock %}

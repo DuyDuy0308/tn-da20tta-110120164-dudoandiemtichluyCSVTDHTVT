@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả dự đoán</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .plot img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .result-item {
+            margin-bottom: 10px;
+        }
+        .result-item strong {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Kết quả dự đoán</h1>
+        
+        <div class="plot">
+            <img src="data:image/png;base64,{{ plot }}" alt="Biểu đồ dự đoán">
+        </div>
+        
+        <div class="results">
+            <div class="result-item">
+                <h2>Kết quả hồi quy tuyến tính</h2>
+                <p><strong>Hệ số:</strong> {{ linear_regression.coefficients }}</p>
+                <p><strong>Hệ số chặn:</strong> {{ linear_regression.intercept }}</p>
+                <p><strong>R-squared (R^2):</strong> {{ linear_regression.r2_score }}</p>
+                <p><strong>Mean Squared Error (MSE):</strong> {{ linear_regression.mean_squared_error }}</p>
+            </div>
+            
+            <div class="result-item">
+                <h2>Kết quả rừng ngẫu nhiên</h2>
+                <p><strong>R-squared (R^2):</strong> {{ random_forest.r2_score }}</p>
+                <p><strong>Mean Squared Error (MSE):</strong> {{ random_forest.mean_squared_error }}</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+ 

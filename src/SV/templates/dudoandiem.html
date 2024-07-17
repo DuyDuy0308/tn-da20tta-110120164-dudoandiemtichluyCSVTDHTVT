@@ -1,0 +1,127 @@
+{% extends "Sv_main.html" %}
+{% load static %}   
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách điểm</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">Danh sách điểm của {{ SV.MSSV }}</h1>
+        
+        <form method="GET" action="{% url 'SV:dudoandiem' SV.MSSV %}" class="mb-4">
+            <div class="form-group">
+                <label for="hoc_ky">Chọn học kỳ:</label>
+                <select class="form-control" name="hoc_ky" id="hoc_ky">
+                    <option value="">Tất cả</option>
+                    {% for hk in hoc_ky_list %}
+                        <option value="{{ hk }}" {% if hk == selected_hoc_ky %}selected{% endif %}>{{ hk }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Xem</button>
+        </form>
+        
+        <table class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Mã môn học</th>
+                    <th scope="col">Tên môn học</th>
+                    <th scope="col">Điểm hệ 10</th>
+                    <th scope="col">Môn tiên quyết</th>
+                    <th scope="col">Tên môn tiên quyết</th>
+                    <th scope="col">Điểm môn tiên quyết</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in combined_data %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ item.Ma_mon_hoc }}</td>
+                        <td>{{ item.Ten_mon_hoc }}</td>
+                        <td>{{ item.Diem_he_10 }}</td>
+                        <td>{{ item.Linh_vuc }}</td>
+                        <td>{{ item.Linh_vuc.Ten_mon_hoc }}</td>
+                        <td>
+                            {% if item.Linh_vuc and item.Diem_Linh_vuc is None %}
+                                <a href="#" class="btn btn-outline-primary btn-sm predict-btn"
+                                   data-mamonhoc="{{ item.Ma_mon_hoc }}"
+                                   data-diem="{{ item.Diem_he_10 }}"
+                                   data-linhvuc="{{ item.Linh_vuc }}"
+                                   data-tenlinhvuc="{{ item.Linh_vuc.Ten_mon_hoc }}">Dự đoán</a>
+                            {% elif item.Linh_vuc %}
+                                {{ item.Diem_Linh_vuc }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <!-- Thêm các thao tác khác nếu cần -->
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Modal để hiển thị thông tin dự đoán -->
+        <div class="modal fade" id="predictModal" tabindex="-1" role="dialog" aria-labelledby="predictModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="predictModalLabel">Thông tin dự đoán</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    
+                    <form id="predictForm" method="POST" action="{% url 'SV:predict' SV.MSSV %}">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <input type="hidden" id="maMonHocInput" name="ma_mon_hoc">
+                            <input type="hidden" id="diemInput" name="diem">
+                            <input type="hidden" id="linhVucInput" name="linh_vuc">
+                            <p>Mã môn học: <span id="predictedMaMonHoc"></span></p>
+                            <p>Điểm: <span id="predictedDiem"></span></p>
+                            <p>Mã môn tiên quyết: <span id="predictedLinhVuc"></span></p>
+                            <p>Tên môn tiên quyết: <span id="tenlinhVuc"></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Gửi</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('.predict-btn').click(function(event) {
+                event.preventDefault();
+                var maMonHoc = $(this).data('mamonhoc');
+                var diem = $(this).data('diem');
+                var linhVuc = $(this).data('linhvuc');
+                var tenlinhVuc = $(this).data('tenlinhvuc');
+
+                $('#predictedMaMonHoc').text(maMonHoc);
+                $('#predictedDiem').text(diem);
+                $('#predictedLinhVuc').text(linhVuc);
+                $('#tenlinhVuc').text(tenlinhVuc);
+
+                $('#maMonHocInput').val(maMonHoc);
+                $('#diemInput').val(diem);
+                $('#linhVucInput').val(linhVuc);
+                $('#tenlinhVuc').val(tenlinhVuc);
+
+                $('#predictModal').modal('show');
+            });
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

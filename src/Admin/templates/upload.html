@@ -1,0 +1,89 @@
+{% extends "main.html" %}
+{% load static %}   
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Dự đoán điểm số</h3>
+                </div>
+                <div class="card-body">
+                    <div class="container">
+                        
+
+                        <div class="modal fade" id="popup1" tabindex="-1" role="dialog" aria-labelledby="popup1Label" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="popup1Label">Thêm giảng viên mới</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            {{ form_covan.as_p }}
+                                            <button type="submit" class="btn btn-primary" name="add">Lưu</button>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table id="example1" class="table table-bordered table-striped">
+                            <form method="post" id="delete-form">
+                                {% csrf_token %}
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="select-all"></th>
+                                            <th>Mã số giảng viên</th>
+                                            <th>Tên giảng viên</th>
+                                            <th>Địa chỉ </th>
+                                            <th>Giới tính</th>
+                                            <th>Ngày sinh</th>
+                                            <th>Email</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for covans in covans %}
+                                        <tr>
+                                            <td><input type="checkbox" name="selected_ids" value="{{ covans.Id_cv }}"></td>
+                                            <td>{{ covans.Id_cv }}</td>
+                                            <td>{{ covans.Ho_ten_cv }}</td>
+                                            <td>{{ covans.Dia_chi_cv }}</td>
+                                            <td>{{ covans.Gioi_tinh_cv }}</td>
+                                            <td>{{ covans.Ngay_sinh_cv }}</td>
+                                            <td>{{ covans.Email_cv }}</td>
+                                            
+                                            <td>
+                                                <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#editModal_cv" 
+                                                        data-id_cv="{{ covans.Id_cv }}" data-ho_ten_cv="{{ covans.Ho_ten_cv }}" 
+                                                        data-dia_chi_cv="{{ covans.Dia_chi_cv }}" data-gioi_tinh_cv="{{ covans.Gioi_tinh_cv }}" 
+                                                        data-ngay_sinh_cv="{{ covans.Ngay_sinh_cv }}" data-email_cv="{{ covans.Email_cv }}" 
+                                                       >Sửa</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">Xóa</button>
+                            </form>
+
+                         
+
+                          
+
+                           
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+{% endblock %}

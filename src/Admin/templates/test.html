@@ -1,0 +1,109 @@
+{% extends "main.html" %}
+{%block content%}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container">
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Dữ liệu mẫu</h3>
+                </div>
+                <div class="card-body">
+                    <div class="card-body">
+                        <div class="container ">
+                            <div class="container container_popup">
+                            </div>
+                            <div class="modal fade" id="popup1" tabindex="-1" role="dialog" aria-labelledby="popup1Label" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="popup1Label">Thêm lĩnh vực mới</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form method="post">
+                                                {% csrf_token %}
+                                                {{ form_linhvuc.as_p }}
+                                                <button type="submit" class="btn btn-primary">Lưu</button>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <table id="example1" class="table table-bordered table-striped">
+                                <form method="post" id="delete-form">
+                                    {% csrf_token %}
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>MSSV</th>
+                                                <th>Họ Tên</th>
+                                                <th>Mã Lớp</th>
+                                                <th>Điểm Hệ 4</th>
+                                                <th>Điểm Hệ 10</th>
+                                                <th>Mã Môn Học</th>
+                                                <th>Môn tiếp theo</th>
+                                                <th>Điểm môn tiếp theo</th>
+                                                <th>Mã HK CTDT</th>
+                                                <th>Mã Loại HP</th>
+                                                <th>Mã Nhóm Môn</th>
+                                                <th>Mã CTDT</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in combined_data %}
+                                            <tr>
+                                                <td>{{ item.MSSV }}</td>
+                                                <td>{{ item.Ho_ten_sv }}</td>
+                                                <td>{{ item.Ma_lop }}</td>
+                                                <td>{{ item.Diem_he_4 }}</td>
+                                                <td>{{ item.Diem_he_10 }}</td>
+                                                <td>{{ item.Ma_mon_hoc }}</td>
+                                                <td>{{ item.Linh_vuc }}</td>
+                                                <td>{{ item.Diem_Linh_vuc }}</td>
+                                                <td>{{ item.Ma_HK_CTDT }}</td>
+                                                <td>{{ item.Ma_loai_hp }}</td>
+                                                <td>{{ item.Ma_nhom_mon }}</td>
+                                                <td>{{ item.Ma_CTDT }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </form>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </section>
+{%endblock%}

@@ -1,0 +1,159 @@
+{% extends "Sv_main.html" %}
+{% load static %}   
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Thêm thư viện Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+</head>
+<body>
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+          <!-- Info boxes -->
+          <div class="row">
+            <div class="col-12 col-sm-6 col-md-3">
+              <div class="info-box">
+                <span class="info-box-icon bg-info elevation-1"><i class="fa-solid fa-school"></i></span>
+  
+                <div class="info-box-content">
+                  <span class="info-box-text">Số môn đạt</span>
+                  <span class="info-box-number">
+                    {{so_mon_da_co_diem}} / {{total_Monhoc}}
+                    <small></small>
+                  </span>
+                </div>
+                <!-- /.info-box-content -->
+              </div>
+              <!-- /.info-box -->
+            </div>
+            <!-- /.col -->
+            <div class="col-12 col-sm-6 col-md-3">
+              <div class="info-box mb-3">
+                <span class="info-box-icon bg-danger elevation-1"><i class="fa-solid fa-book-open"></i></span>
+                <div class="info-box-content">
+                  <span class="info-box-text">Tổng số môn học</span>
+                  <span class="info-box-number">{{total_Monhoc}}</span>
+                </div>
+                <!-- /.info-box-content -->
+              </div>
+              <!-- /.info-box -->
+            </div>
+            <!-- /.col -->
+  
+            <!-- fix for small devices only -->
+  
+            <div class="col-12 col-sm-12 col-md-5">
+              <div class="card border-info shadow-sm">
+                <div class="card-body">
+
+                    <h5 class="card-title text-info mb-4">Tiến trình học tập</h5><br>
+
+                    <div class="progress">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: {{ completion_percentage }}%;" aria-valuenow="{{ completion_percentage }}" aria-valuemin="0" aria-valuemax="100">
+                            <span class="sr-only">{{ completion_percentage }}% hoàn thành</span>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        {% comment %} <p class="text-muted mb-1">Đã đạt được: {{ total_credit_achieved }} tín chỉ</p> {% endcomment %}
+                        {% comment %} <p class="text-muted mb-1">Tổng số tín chỉ: 138</p> {% endcomment %}
+                    </div>
+                </div>
+            </div>
+        </div>
+            </div>
+            <!-- /.col -->
+            
+            <!-- /.col -->
+          </div>
+          <!-- /.row -->
+    <canvas id="myChart1" height="50px"></canvas>
+    <script>
+        var labels = {{ labels|safe }};
+        var data = {{ data|safe }};
+
+        // Vẽ biểu đồ
+        var ctx = document.getElementById('myChart1').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Sĩ số',
+                    data: data,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        display: false 
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false  // Ẩn hiển thị legend
+                    }
+                }
+            }
+        });
+    </script>
+
+      <!-- Custom tabs (Charts with tabs)-->  
+      <div class="card-header" >
+        <h3 class="card-title">
+          <ul class="nav nav-pills ml-auto">
+            <li class="nav-item">
+              <div class="nav-link active" href="#revenue-chart" data-toggle="tab">Điểm hệ 4 cao nhất và thấp nhất</div>
+            </li> 
+          </ul>
+        </h3>
+
+    <div>
+        <canvas id="score-chart" height="50px"></canvas>
+      </div><!-- /.card-header -->
+
+      </div>
+      <!-- /.card -->
+    </section>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+          // Biểu đồ điểm hệ 4
+          var ctxScore = document.getElementById('score-chart').getContext('2d');
+          var scoreChart = new Chart(ctxScore, {
+              type: 'line',
+              data: {
+                  labels: {{ score_labels|safe }},
+                  datasets: [{
+                      label: 'Điểm hệ 4',
+                      data: {{ score_data|safe }},
+                      backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                      borderColor: 'rgba(153, 102, 255, 1)',
+                      borderWidth: 1
+                  }]
+              },
+              options: {
+                  scales: {
+                      y: {
+                          beginAtZero: false,
+                          min: 1,
+                          max: 4,
+                          ticks: {
+                            stepSize: 0.1,
+                            callback: function(value) {
+                                return value.toFixed(1);
+                            }
+                        }
+                      }
+                  }
+              }
+          });
+      });
+  </script>
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,237 @@
+{% extends "CV_main.html" %}
+{% load static %}   
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Bảng điểm</h3>
+                </div>
+                <div class="card-body">
+                    <div class="container">
+                        <div class="container_popup">
+                            <button type="button" class="btn btn-primary btn_popup" data-toggle="modal" data-target="#popup1">
+                                Thêm Bảng điểm
+                            </button>
+                            <button type="button" class="btn btn-secondary btn_popup" data-toggle="modal" data-target="#popup2">
+                                Thêm Bảng điểm bằng file
+                            </button>
+                            <a href="{% static 'excel/mau_bd.xlsx' %}" class="btn btn-success btn_popup" role="button">
+                                Tải file mẫu Excel
+                            </a>
+                        </div>
+
+                        <div class="modal fade" id="popup1" tabindex="-1" role="dialog" aria-labelledby="popup1Label" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="popup1Label">Thêm Bảng điểm mới</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            {{ form_bangdiem.as_p }}
+                                            <button type="submit" class="btn btn-primary" name="add">Lưu</button>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table id="example1" class="table table-bordered table-striped">
+                            <form method="post" id="delete-form">
+                                {% csrf_token %}
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="select-all"></th>
+                                            <th>Mã bảng điểm</th>
+                                            <th>Điểm hệ 4</th>
+                                            <th>Mã số sinh viên</th>
+                                            <th>Học kỳ niên khóa</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for bangdiems in bangdiems %}
+                                        <tr>
+                                            <td><input type="checkbox" name="selected_ids" value="{{ bangdiems.Ma_bang_diem }}"></td>
+                                            <td>{{ bangdiems.Ma_bang_diem }}</td>
+                                            <td>{{ bangdiems.Diem_tich_luy_he_4 }}</td>
+                                            <td>{{ bangdiems.MSSV }}</td>
+                                            <td>{{ bangdiems.Ma_hk_nien_khoa }}</td>
+                                            
+                                            <td>
+                                                <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#editModal_bangdiem" 
+                                                        data-ma_bang_diem="{{ bangdiems.Ma_bang_diem }}" data-diem_tich_luy_he_4="{{ bangdiems.Diem_tich_luy_he_4 }}" 
+                                                        data-mssv="{{ bangdiems.MSSV }}" data-ma_hk_nien_khoa="{{ bangdiems.Ma_hk_nien_khoa }}" 
+                                                       >Sửa</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">Xóa</button>
+                            </form>
+
+                            <!-- Modal xác nhận xóa -->
+                            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Bạn có chắc chắn muốn xóa các dòng đã chọn?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                                            <button type="submit" class="btn btn-danger" form="delete-form" name="delete">Xóa</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal thành công khi xóa -->
+                            <div class="modal fade" id="successModal_delete" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="successModalLabel">Thông báo</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Xóa thành công các dòng đã chọn.
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal thành công khi chỉnh sửa -->
+                            <div class="modal fade" id="successModal_edit" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="successModalLabel">Thông báo</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Sửa thành công.
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal thành công khi thêm mới -->
+                            <div class="modal fade" id="addSuccessModal" tabindex="-1" role="dialog" aria-labelledby="addSuccessModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="addSuccessModalLabel">Thông báo</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Thêm thành công.
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a href="{% url 'bangdiem' %}" class="btn btn-secondary">Đóng</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal chỉnh sửa -->
+                            <div class="modal fade" id="editModal_bangdiem" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="editModalLabel">Chỉnh sửa sinh viên</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form method="post" id="edit-form">
+                                                {% csrf_token %}
+                                                <div class="form-group">
+                                                    <label for="edit-ma_bang_diem">Mã bảng điểm</label>
+                                                    <input type="text" class="form-control" id="edit-ma_bang_diem" name="Ma_bang_diem" readonly>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="edit-diem_tich_luy_he_4">Điểm hệ 4</label>
+                                                    <input type="text" class="form-control" id="edit-diem_tich_luy_he_4" name="Diem_tich_luy_he_4">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="edit-msvv">Mã số sinh viên</label>
+                                                    <select id="edit-mssv" name="MSSV" required>
+                                                       {% for sinhviens in sinhviens %}
+                                                            <option value="{{ sinhviens.MSSV }}">{{ sinhviens.MSSV }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="edit-ma_hk_nien_khoa">Học kỳ niên khóa</label>
+                                                    <select id="edit-ma_hk_nien_khoa" name="Ma_hk_nien_khoa" required>
+                                                       {% for hknks in hknks %}
+                                                            <option value="{{ hknks.Ma_hk_nien_khoa }}">{{ hknks.Ma_hk_nien_khoa }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary" name="edit">Lưu</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal thêm bằng file -->
+                            <div class="modal fade" id="popup2" tabindex="-1" role="dialog" aria-labelledby="popup2Label" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="popup2Label">Thêm sinh viên bằng file</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form method="post" enctype="multipart/form-data" class="mt-3">
+                                                {% csrf_token %}
+                                                {{ form_file.as_p }}
+                                                <button type="submit" class="btn btn-primary" name="import">Upload</button>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+{% endblock %}

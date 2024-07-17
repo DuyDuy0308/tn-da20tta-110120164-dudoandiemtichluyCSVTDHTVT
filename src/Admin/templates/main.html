@@ -1,0 +1,545 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin</title>
+    <link rel="stylesheet" href="{% static 'assets/css/my_style.css' %}">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+    <!-- css  -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{% static 'plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/summernote/summernote-bs4.min.css' %}">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{% static 'dist/css/adminlte.css' %}">
+    <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+</head>
+
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <!-- Brand Logo -->
+            <a href="../../index3.html" class="brand-link">
+
+            </a>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Sidebar user (optional) -->
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="image">
+
+                    </div>
+                    <div class="info">
+                        <a href="{% url 'main' %}" class="d-block"> Admin</a> 
+                    </div>
+                </div>
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <!-- Add icons to the links using the .nav-icon class
+               with font-awesome or any other icon font library -->
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>
+                                    Quản lý dữ liệu chung 
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{% url 'hknienkhoa' %}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Học kỳ niên khóa</p>
+                                    </a>
+                                </li>
+                               
+                                <li class="nav-item">
+                                    <a href="{% url 'bomon' %}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Bộ môn</p>
+                                    </a>
+                                </li>
+                            <li class="nav-item">
+                                <a href="{% url 'lop' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Lớp</p>
+                                </a>
+                            </li>
+                              <li class="nav-item">
+                                <a href="{% url 'khoa' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Khoa</p>
+                                </a>
+                            </li>
+                            
+                          <li class="nav-item">
+                            <a href="{% url 'nganhdaotao' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Ngành đào tạo</p>
+                            </a>
+                        </li>    
+                            </ul>
+                            </li>
+
+                          <li class="nav-item">
+                            <a href="#" class="nav-link">
+                             <i class="nav-icon fas fa-edit"></i>
+                                 <p>
+                                    Quản lý chương trình đào tạo
+                                     <i class="right fas fa-angle-left"></i>
+                                 </p>
+                             </a>
+                            <ul class="nav nav-treeview">
+                                 <li class="nav-item">
+                                <a href="{% url 'ctdt' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Chương trình đào tạo</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'hkctdt' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Học kỳ CTDT </p>
+                                </a>
+                            </li>
+                                 <li class="nav-item">
+                                <a href="{% url 'monhoc' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Môn học</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'nhommon' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Nhóm môn</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'loaihocphan' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Loại học phần</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'tctdt' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Thuộc chương trình đào tạo</p>
+                                </a>
+                            </li> 
+                             </ul> 
+                         </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                             <i class="nav-icon fas fa-edit"></i>
+                                 <p>
+                                    Quản lý người dùng
+                                     <i class="right fas fa-angle-left"></i>
+                                 </p>
+                             </a>
+                            <ul class="nav nav-treeview">
+                                 <li class="nav-item">
+                                     <a href="{% url 'student' %}" class="nav-link">
+                                         <i class="far fa-circle nav-icon"></i>
+                                         <p>Sinh viên</p>
+                                     </a>
+                                 </li>
+                                 <li class="nav-item">
+                                     <a href="{% url 'teacher' %}" class="nav-link">
+                                         <i class="far fa-circle nav-icon"></i>
+                                         <p>Cố vấn</p>
+                                     </a>
+                                 </li>
+                                 <li class="nav-item">
+                                    <a href="{% url 'taotaikhoan' %}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Tạo tài khoản</p>
+                                    </a>
+                                </li>
+                             </ul> 
+                         </li>
+                         <li class="nav-item">
+                            <a href="#" class="nav-link">
+                             <i class="nav-icon fas fa-edit"></i>
+                                 <p>
+                                    Tùy chỉnh hệ thống
+                                     <i class="right fas fa-angle-left"></i>
+                                 </p>
+                             </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{% url 'bangdiem' %}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Bảng điểm</p>
+                                    </a>
+                                </li>
+                              
+                                <li class="nav-item">
+                                    <a href="{% url 'ctbd' %}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Chi tiết bảng điểm</p>
+                                    </a>
+                                </li>
+                                  <li class="nav-item">
+                                <a href="{% url 'dlm' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Dữ liệu mẫu</p>
+                                </a>
+                            </li> 
+                             <li class="nav-item">
+                                <a href="{% url 'upload' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Dự đoán</p>
+                                </a>
+                            </li> 
+                             </ul> 
+                         </li> 
+                    </ul>
+                    </li>
+                </nav>
+                <!-- /.sidebar-menu -->
+            </div>
+            <!-- /.sidebar -->
+        </aside>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                    </div>
+                </div><!-- /.container-fluid -->
+            </section>
+            <!-- Main content -->
+            <section class="content">
+                {%block content%}
+                {%endblock%}
+            </section>
+
+
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+        <footer class="main-footer">
+            <div class="float-right d-none d-sm-block">
+                <b>Version</b> 3.2.0
+            </div>
+            <strong>Copyright &copy; 2024 <a href="https://www.facebook.com/Cadyofworld/">Cady</a>.</strong> All rights reserved.
+        </footer>
+
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
+    </div>
+    <!-- ./wrapper -->
+
+    <!-- jQuery -->
+    <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+    <!-- Bootstrap 4 -->
+    <script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <!-- DataTables & Plugins -->
+    <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'plugins/jszip/jszip.min.js' %}"></script>
+    <script src="{% static 'plugins/pdfmake/pdfmake.min.js' %}"></script>
+    <script src="{% static 'plugins/pdfmake/vfs_fonts.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+    <!-- AdminLTE App -->
+    <script src="{% static 'dist/js/adminlte.min.js' %}"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src="{% static 'dist/js/demo.js' %}"></script>
+    <!-- Summernote -->
+    <script src="{% static 'plugins/summernote/summernote-bs4.min.js' %}"></script>
+    <!-- Page specific script -->
+   
+    <script>
+      // Script để chọn tất cả các checkbox
+      document.getElementById('select-all').onclick = function() {
+          var checkboxes = document.getElementsByName('selected_ids');
+          for (var checkbox of checkboxes) {
+              checkbox.checked = this.checked;
+          }
+      }
+      function resetForm() {
+        document.getElementById("myForm").reset();
+      }
+      {% if add_success %}
+      $(document).ready(function() {
+          $('#addSuccessModal').modal('show');
+      });
+      {% endif %}
+      // Hiển thị modal thông báo xóa thành công nếu cần
+      {% if delete_success %}
+      $(document).ready(function() {
+          $('#successModal_delete').modal('show');
+      });
+      {% endif %}
+  
+      // Hiển thị modal thông báo sửa thành công nếu cần
+      {% if edit_success %}
+      $(document).ready(function() {
+          $('#successModal_edit').modal('show');
+      });
+      {% endif %}
+  
+      // Thiết lập dữ liệu cho modal chỉnh sửa
+     
+  </script>
+    {% comment %} hiển thị form sửa của bảng "Cố vấn" {% endcomment %}
+    <script>
+        $('#editModal_cv').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget);
+          var id_cv = button.data('id_cv');
+          var ho_ten_cv = button.data('ho_ten_cv');
+          var dia_chi_cv = button.data('dia_chi_cv');
+          var gioi_tinh_cv = button.data('gioi_tinh_cv');
+          var ngay_sinh_cv = button.data('ngay_sinh_cv');
+          var email_cv = button.data('email_cv');
+      
+          var modal = $(this);
+          modal.find('#edit-id_cv').val(id_cv);
+          modal.find('#edit-ho_ten_cv').val(ho_ten_cv);
+          modal.find('#edit-dia_chi_cv').val(dia_chi_cv);
+          modal.find('#edit-gioi_tinh_cv').val(gioi_tinh_cv);
+          modal.find('#edit-ngay_sinh_cv').val(ngay_sinh_cv);
+          modal.find('#edit-email_cv').val(email_cv);
+      });
+      </script>
+  {% comment %} hiển thị form sửa của bảng "Khoa" {% endcomment %}
+  <script>
+    $('#editModal_khoa').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget);
+      var ma_khoa = button.data('ma_khoa');
+      var ten_khoa = button.data('ten_khoa');
+  
+      var modal = $(this);
+      modal.find('#edit-ma_khoa').val(ma_khoa);
+      modal.find('#edit-ten_khoa').val(ten_khoa);
+  });
+  </script>
+  {% comment %} hiển thị form sửa của bảng "Bộ môn" {% endcomment %}
+  <script>
+    $('#editModal_bomon').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var ma_bomon = button.data('ma_bomon');
+        var ten_bomon = button.data('ten_bomon');
+        var ma_khoa = button.data('ma_khoa');
+
+        var modal = $(this);
+        modal.find('#edit-ma_bo_mon').val(ma_bomon);
+        modal.find('#edit-ten_bo_mon').val(ten_bomon);
+        modal.find('#edit-ma_khoa').val(ma_khoa);
+    });
+  </script>
+   {% comment %} hiển thị form sửa của bảng "Ngành đào tạo" {% endcomment %}
+   <script>
+    $('#editModal_nganhdaotao').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget);
+          var ma_nganh = button.data('ma_nganh');
+          var ten_nganh = button.data('ten_nganh');
+      
+          var modal = $(this);
+          modal.find('#edit-ma_nganh').val(ma_nganh);
+          modal.find('#edit-ten_nganh').val(ten_nganh);
+      });
+      </script>
+  {% comment %} hiển thị form sửa của bảng "hk niên khóa" {% endcomment %}
+  <script>
+    $('#editModal_nienkhoa').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget);
+      var ma_hk_nien_khoa = button.data('ma_hk_nien_khoa');
+      var ten_hk_nien_khoa = button.data('ten_hk_nien_khoa');
+  
+      var modal = $(this);
+      modal.find('#edit-ma_hk_nien_khoa').val(ma_hk_nien_khoa);
+      modal.find('#edit-ten_hk_nien_khoa').val(ten_hk_nien_khoa);
+  });
+  </script>
+        {% comment %} hiển thị form sửa của bảng "lĩnh vực" {% endcomment %}
+    <script>
+        $('#editModal_linhvuc').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget);
+          var ma_linh_vuc = button.data('ma_linh_vuc');
+          var ten_linh_vuc = button.data('ten_linh_vuc');
+      
+          var modal = $(this);
+          modal.find('#edit-ma_linh_vuc').val(ma_linh_vuc);
+          modal.find('#edit-ten_linh_vuc').val(ten_linh_vuc);
+      });
+      </script>
+       {% comment %} hiển thị form sửa của bảng "lĩnh vực" {% endcomment %}
+    <script>
+        $('#editModal_loaihocphan').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget);
+          var ma_loai_hp = button.data('ma_loai_hp');
+          var ten_loai_hp = button.data('ten_loai_hp');
+      
+          var modal = $(this);
+          modal.find('#edit-ma_loai_hp').val(ma_loai_hp);
+          modal.find('#edit-ten_loai_hp').val(ten_loai_hp);
+      });
+      </script>
+       {% comment %} hiển thị form sửa của bảng "Học kỳ chương trình đào tạo" {% endcomment %}
+       <script>
+        $('#editModal_HK_CTDT').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget);
+          var ma_hk_ctdt = button.data('ma_hk_ctdt');
+          var ten_hk_ctdt = button.data('ten_hk_ctdt');
+      
+          var modal = $(this);
+          modal.find('#edit-ma_hk_ctdt').val(ma_hk_ctdt);
+          modal.find('#edit-ten_hk_ctdt').val(ten_hk_ctdt);
+      });
+      </script>
+       {% comment %} hiển thị form sửa của bảng "nhóm môn" {% endcomment %}
+    <script>
+        $('#editModal_nhommon').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget);
+          var ma_nhom_mon = button.data('ma_nhom_mon');
+          var ten_nhom_mon = button.data('ten_nhom_mon');
+      
+          var modal = $(this);
+          modal.find('#edit-ma_nhom_mon').val(ma_nhom_mon);
+          modal.find('#edit-ten_nhom_mon').val(ten_nhom_mon);
+      });
+      </script>
+       {% comment %} hiển thị form sửa của bảng "chương trình đào tạo" {% endcomment %}
+    <script>
+        $('#editModal_ctdts').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget);
+          var ma_ctdt = button.data('ma_ctdt');
+          var ten_ctdt = button.data('ten_ctdt');
+          var ngay_quyet_dinh = button.data('ngay_quyet_dinh');
+          var so_quyet_dinh = button.data('so_quyet_dinh');
+          var loai_hinh_dao_tao = button.data('loai_hinh_dao_tao');
+          var ma_nganh = button.data('ma_nganh');
+          var tong_so_tin_chi = button.data('tong_so_tin_chi');
+          
+          var modal = $(this);
+          modal.find('#edit-ma_ctdt').val(ma_ctdt);
+          modal.find('#edit-ten_ctdt').val(ten_ctdt);
+          modal.find('#edit-ngay_quyet_dinh').val(ngay_quyet_dinh);
+          modal.find('#edit-so_quyet_dinh').val(so_quyet_dinh);
+          modal.find('#edit-loai_hinh_dao_tao').val(loai_hinh_dao_tao);
+          modal.find('#edit-ma_nganh').val(ma_nganh);
+          modal.find('#edit-tong_so_tin_chi').val(tong_so_tin_chi);
+        
+      });
+      </script>
+      {% comment %} hiển thị form sửa của bảng "Lớp" {% endcomment %}
+      <script>
+        $('#editModal_lop').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget);
+          var ma_lop = button.data('ma_lop');
+          var ten_lop = button.data('ten_lop');
+          var id_cv = button.data('id_cv');
+          var ma_ctdt = button.data('ma_ctdt');
+      
+          var modal = $(this);
+          modal.find('#edit-ma_lop').val(ma_lop);
+          modal.find('#edit-ten_lop').val(ten_lop);
+          modal.find('#edit-id_cv').val(id_cv);
+          modal.find('#edit-ma_ctdt').val(ma_ctdt);
+      });
+      </script>
+       {% comment %} hiển thị form sửa của bảng "Sinh viên" {% endcomment %}
+       <script>
+        $('#editModal_sv').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget);
+          var mssv = button.data('mssv');
+          var hoten_sv = button.data('hoten_sv');
+          var dia_chi_sv = button.data('dia_chi_sv');
+          var gioi_tinh_sv = button.data('gioi_tinh_sv');
+          var ngay_sinh_sv = button.data('ngay_sinh_sv');
+          var email_sv = button.data('email_sv');
+          var ma_lop = button.data('ma_lop');
+          
+      
+          var modal = $(this);
+          modal.find('#edit-mssv').val(mssv);
+          modal.find('#edit-hoten_sv').val(hoten_sv);
+          modal.find('#edit-dia_chi_sv').val(dia_chi_sv);
+          modal.find('#edit-gioi_tinh_sv').val(gioi_tinh_sv);
+          modal.find('#edit-ngay_sinh_sv').val(ngay_sinh_sv);
+          modal.find('#edit-email_sv').val(email_sv);
+          modal.find('#edit-ma_lop').val(ma_lop);
+      });
+      </script>
+       {% comment %} hiển thị form sửa của bảng "Bảng điểm" {% endcomment %}
+       <script>
+        $('#editModal_bangdiem').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget);
+          var ma_bang_diem = button.data('ma_bang_diem');
+          var diem_tich_luy_he_4 = button.data('diem_tich_luy_he_4');
+          var mssv = button.data('mssv');
+          var ma_hk_nien_khoa = button.data('ma_hk_nien_khoa');
+      
+          var modal = $(this);
+          modal.find('#edit-ma_bang_diem').val(ma_bang_diem);
+          modal.find('#edit-diem_tich_luy_he_4').val(diem_tich_luy_he_4);
+          modal.find('#edit-mssv').val(mssv);
+          modal.find('#edit-ma_hk_nien_khoa').val(ma_hk_nien_khoa);
+      });
+      </script>
+      {% comment %} hiển thị form sửa của bảng "Môn học" {% endcomment %}
+      <script>
+        $('#editModal_monhoc').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget);
+          var ma_mon_hoc = button.data('ma_mon_hoc');
+          var ten_mon_hoc = button.data('ten_mon_hoc');
+          var tin_chi = button.data('tin_chi');
+          var linh_vuc = button.data('linh_vuc');
+      
+          var modal = $(this);
+          modal.find('#edit-ma_mon_hoc').val(ma_mon_hoc);
+          modal.find('#edit-ten_mon_hoc').val(ten_mon_hoc);
+          modal.find('#edit-tin_chi').val(tin_chi);
+          modal.find('#edit-linh_vuc').val(linh_vuc);
+      });
+      </script>
+      {% comment %} hiển thị form sửa của bảng "Chi tiết bảng điểm" {% endcomment %}
+      <script>
+        $('#editModal_ctbdd').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget);
+          var diem_he_4 = button.data('diem_he_4');
+          var diemhe4 = button.data('diemhe4');
+          var diem_he_10 = button.data('diem_he_10');
+          var diem_he_10_lan_2 = button.data('diem_he_10_lan_2');
+          var ma_mon_hoc = button.data('ma_mon_hoc');
+          var ma_bang_diem = button.data('ma_bang_diem');
+      
+          var modal = $(this);
+          modal.find('#edit-diem_he_4').val(diem_he_4);
+          modal.find('#edit-diemhe4').val(diemhe4);
+          modal.find('#edit-diem_he_10').val(diem_he_10);
+          modal.find('#edit-diem_he_10_lan_2').val(diem_he_10_lan_2);
+          modal.find('#edit-ma_mon_hoc').val(ma_mon_hoc);
+          modal.find('#edit-ma_bang_diem').val(ma_bang_diem);
+      });
+      </script>
+</body>
+
+</html>

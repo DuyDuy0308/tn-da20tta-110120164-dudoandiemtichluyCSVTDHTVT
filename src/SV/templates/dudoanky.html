@@ -1,0 +1,96 @@
+{% extends "Sv_main.html" %}
+{% load static %}   
+{% block content %}
+<script>
+    // Kiểm tra nếu trang được reload lần thứ hai
+    if (performance.navigation.type === 1) {
+        // Kiểm tra xem đã có thông tin lần reload trước đó trong session chưa
+        if (sessionStorage.getItem('reloaded')) {
+            // Điều hướng người dùng về URL khác trong Django
+            window.location.href = "{% url 'SV:hoc_ky_mon_hoc' SV.MSSV %}";
+        } else {
+            // Lưu thông tin đã reload lần đầu vào session
+            sessionStorage.setItem('reloaded', 'true');
+        }
+    }
+</script>
+{% block scripts %}
+<script>
+// Kiểm tra sự kiện khi trang được tải lại
+window.onload = function () {
+    if (window.history && window.history.pushState) {
+        window.history.pushState('forward', null, './#reload');
+        window.onpopstate = function () {
+            if (window.location.hash === '#reload') {
+                // Chuyển hướng người dùng đến một URL khác (ví dụ /home/)
+                window.location.href = "{% url 'SV:hoc_ky_mon_hoc' SV.MSSV %}";
+            }
+        };
+    }
+};
+</script>
+{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dự đoán kết quả điểm</title>
+    <!-- Đưa Bootstrap vào nếu bạn muốn -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        {% comment %} <h2>Kết quả dự đoán điểm</h2>
+
+        <h3>Linear Regression</h3>
+        <p><strong>R² Score:</strong> {{ linear_regression.r2_score }}</p>
+        <p><strong>Mean Squared Error:</strong> {{ linear_regression.mean_squared_error }}</p>
+        <p><strong>Coefficients:</strong> {{ linear_regression.coefficients }}</p>
+        <p><strong>Intercept:</strong> {{ linear_regression.intercept }}</p>
+
+        <h3>Random Forest</h3>
+        <p><strong>R² Score:</strong> {{ random_forest.r2_score }}</p>
+        <p><strong>Mean Squared Error:</strong> {{ random_forest.mean_squared_error }}</p> {% endcomment %}
+
+        <h3>Kết qua dự đoán điểm cho từng môn học</h3>
+        <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Số thứ tự</th>
+                    <th>Mã môn học</th>
+                    <th>Kết quả dự đoán bằng thuật toán Hồi quy tuyến tính</th>
+                    <th>Kết quả dự đoán bằng thuật toán Rừng ngẫu nhiên</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in linear_regression_results %}
+                <tr>
+                    <td>{{ forloop.counter }}</td> 
+                    <td>{{ result.ma_mon_hoc }}</td>
+                    <td>{{ result.new_prediction|floatformat:2|default:"Không có dữ liệu" }}</td>
+                    {% for rf_result in random_forest_results %}
+                        {% if rf_result.ma_mon_hoc == result.ma_mon_hoc %}
+                            <td>{{ rf_result.new_prediction|floatformat:2|default:"Không có dữ liệu" }}</td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+            
+            <tfoot>
+                <tr>
+                    <td colspan="3"> <strong>Kết quả dự đoán trung bình tích lũy bằng thuật toán Hồi quy tuyến tính:</strong></td>
+                    <td>{{ average_linear_reg|floatformat:2|default:"Không có dữ liệu" }}</td>
+                </tr>
+                <tr>
+                    <td colspan="3"><strong>Kết quả dự đoán trung bình tích lũy bằng thuật toán Rừng ngẫu nhiên:</strong></td>
+                    <td>{{ average_random_forest|floatformat:2|default:"Không có dữ liệu" }}</td>
+                </tr>
+            </tfoot>
+            
+            
+        </table>
+    </div>
+</body>
+</html>
+{% endblock %}

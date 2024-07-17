@@ -1,0 +1,64 @@
+{% extends "Sv_main.html" %}
+{% load static %}   
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Điểm học kỳ</h1>
+        <form method="get" action="">
+            <div class="form-group">
+                <label for="hoc_ky">Chọn học kỳ:</label>
+                <select class="form-control" id="hoc_ky" name="hoc_ky" onchange="this.form.submit()">
+                    <option value="">-- Chọn học kỳ --</option>
+                    {% for hoc_ky in hoc_ky_list %}
+                        <option value="{{ hoc_ky.Ma_hk_nien_khoa }}" {% if selected_hoc_ky and hoc_ky.Ma_hk_nien_khoa == selected_hoc_ky.Ma_hk_nien_khoa %}selected{% endif %}>
+                            {{ hoc_ky.Ten_hk_nien_khoa }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+
+        {% if selected_hoc_ky %}
+            <h2 class="mt-4">{{ selected_hoc_ky.Ten_hk_nien_khoa }}</h2>
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Số thứ tự</th>
+                        <th>Mã môn học</th>
+                        <th>Môn học</th>
+                        <th>Tín chỉ</th>
+                        <th>Điểm hệ 4</th>
+                        <th>Điểm hệ 10</th>
+                        <th>Điểm hệ 10 lần 2</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bang_diem in bang_diem_list %}
+                        {% for chi_tiet in bang_diem.chitiet_bangdiem_set.all %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ chi_tiet.Ma_mon_hoc}}</td>
+                                <td>{{ chi_tiet.Ma_mon_hoc.Ten_mon_hoc }}</td>
+                                <td>{{ chi_tiet.Ma_mon_hoc.Tin_chi }}</td>
+                                <td>{{ chi_tiet.Diem_he_4 }}</td>
+                                <td>{{ chi_tiet.Diem_he_10 }}</td>
+                                <td>{{ chi_tiet.Diem_he_10_lan_2 }}</td>  
+                            </tr>
+                            
+                        {% endfor %}
+                        <tr>
+                            <td> Điểm tích lũy: {{ bang_diem.Diem_tich_luy_he_4 }} </td>
+                            
+                        </tr>
+                        <tr>
+                            <td> Điểm trung bình học kỳ: {{ bang_diem.Diem_trung_binh_hoc_ky }} </td>
+                           
+                        </tr>
+                    {% endfor %}
+                   
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+
+{% endblock %}

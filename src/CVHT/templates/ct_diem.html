@@ -1,0 +1,250 @@
+{% extends "cv_main.html" %}
+{% load static %}   
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Chi tiết bảng điểm</h3>
+                </div>
+                <div class="card-body">
+                    <div class="container">
+                        <div class="container_popup">
+                            <button type="button" class="btn btn-primary btn_popup" data-toggle="modal" data-target="#popup1">
+                                Thêm chi tiết bảng điểm
+                            </button>
+                            <button type="button" class="btn btn-secondary btn_popup" data-toggle="modal" data-target="#popup2">
+                                Thêm bảng điểm bằng file
+                            </button>
+                            <a href="{% static 'excel/mau_ctbd.xlsx' %}" class="btn btn-success btn_popup" role="button">
+                                Tải file mẫu Excel
+                            </a>
+                        </div>
+
+                        <div class="modal fade" id="popup1" tabindex="-1" role="dialog" aria-labelledby="popup1Label" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="popup1Label">Thêm bảng điểm mới</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            {{ form_ctbd.as_p }}
+                                            <button type="submit" class="btn btn-primary" name="add">Lưu</button>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table id="example1" class="table table-bordered table-striped">
+                            <form method="post" id="delete-form">
+                                {% csrf_token %}
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="select-all"></th>
+                                            <th>Mã chi tiết bảng điểm</th>
+                                            <th>Điểm hệ 4</th>
+                                            <th>Điểm hệ 10</th>
+                                            <th>Điểm hệ 10 lần 2</th>
+                                            <th>Mã môn học</th>
+                                            <th>Mã bảng điểm</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for ctbds in ctbds %}
+                                        <tr>
+                                            <td><input type="checkbox" name="selected_ids" value="{{ ctbds.Ma_CTBD }}"></td>
+                                            <td>{{ ctbds.Ma_CTBD }}</td>
+                                            <td>{{ ctbds.Diem_he_4 }}</td>
+                                            <td>{{ ctbds.Diem_he_10 }}</td>
+                                            <td>{{ ctbds.Diem_he_10_lan_2 }}</td>
+                                            <td>{{ ctbds.Ma_mon_hoc }}</td>
+                                            <td>{{ ctbds.Ma_bang_diem }}</td>
+                                            
+                                            <td>
+                                                <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#editModal_ctbda" 
+                                                        data-diem_he_4="{{ ctbds.Ma_CTBD }}" data-diemhe4="{{ ctbds.Diem_he_4 }}"
+                                                        data-diem_he_10="{{ ctbds.Diem_he_10 }}" data-diem_he_10_lan_2="{{ ctbds.Diem_he_10_lan_2 }}" 
+                                                        data-ma_mon_hoc="{{ ctbds.Ma_mon_hoc }}" data-ma_bang_diem="{{ ctbds.Ma_bang_diem }}" 
+                                                        >Sửa</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">Xóa</button>
+                            </form>
+
+                            <!-- Modal xác nhận xóa -->
+                            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Bạn có chắc chắn muốn xóa các dòng đã chọn?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                                            <button type="submit" class="btn btn-danger" form="delete-form" name="delete">Xóa</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal thành công khi xóa -->
+                            <div class="modal fade" id="successModal_delete" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="successModalLabel">Thông báo</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Xóa thành công các dòng đã chọn.
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal thành công khi chỉnh sửa -->
+                            <div class="modal fade" id="successModal_edit" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="successModalLabel">Thông báo</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Sửa thành công.
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal thành công khi thêm mới -->
+                            <div class="modal fade" id="addSuccessModal" tabindex="-1" role="dialog" aria-labelledby="addSuccessModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="addSuccessModalLabel">Thông báo</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Thêm thành công.
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a href="{% url 'ctbd' %}" class="btn btn-secondary">Đóng</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal chỉnh sửa -->
+                            <div class="modal fade" id="editModal_ctbda" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="editModalLabel">Chỉnh sửa chi tiết bảng điểm</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form method="post" id="edit-form">
+                                                {% csrf_token %}
+                                                <div class="form-group">
+                                                    <label for="edit-diem_he_4">Điểm hệ 4</label>
+                                                    <input type="text" class="form-control" id="edit-diem_he_4" name="Ma_CTBD" readonly>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="edit-diemhe4">Điểm hệ 4</label>
+                                                    <input type="text" class="form-control" id="edit-diemhe4" name="Diem_he_4">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="edit-diem_he_10">Điểm hệ 10</label>
+                                                    <input type="text" class="form-control" id="edit-diem_he_10" name="Diem_he_10">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="edit-diem_he_10_lan_2">Điểm hệ 10 lần 2</label>
+                                                    <input type="text" class="form-control" id="edit-diem_he_10_lan_2" name="Diem_he_10_lan_2">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="edit-ma_mon_hoc">Mã môn học</label>
+                                                    <select id="edit-ma_mon_hoc" name="Ma_mon_hoc" required>
+                                                       {% for monhocs in monhocs %}
+                                                            <option value="{{ monhocs.Ma_mon_hoc }}">{{ monhocs.Ma_mon_hoc }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="edit-ma_bang_diem">Mã bảng điểm</label>
+                                                    <select id="edit-ma_bang_diem" name="Ma_bang_diem" required>
+                                                       {% for bangdiems in bangdiems %}
+                                                            <option value="{{ bangdiems.Ma_bang_diem }}">{{ bangdiems.Ma_bang_diem }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary" name="edit">Lưu</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal thêm bằng file -->
+                            <div class="modal fade" id="popup2" tabindex="-1" role="dialog" aria-labelledby="popup2Label" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="popup2Label">Thêm sinh viên bằng file</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form method="post" enctype="multipart/form-data" class="mt-3">
+                                                {% csrf_token %}
+                                                {{ form_file.as_p }}
+                                                <button type="submit" class="btn btn-primary" name="import">Upload</button>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+{% endblock %}

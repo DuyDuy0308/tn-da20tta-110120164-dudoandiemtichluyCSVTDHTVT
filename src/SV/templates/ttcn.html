@@ -1,0 +1,137 @@
+{% extends "Sv_main.html" %}
+{% load static %}   
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <h5 class="card-header">Thông tin cá nhân của {{ SV.Ho_ten_sv }}</h5>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th scope="row" style="width: 30%;">Mã số sinh viên</th>
+                            <td>{{ SV.MSSV }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Họ và tên</th>
+                            <td>{{ SV.Ho_ten_sv }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Địa chỉ</th>
+                            <td>{{ SV.Dia_chi_sv }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Giới tính</th>
+                            <td>{{ SV.Gioi_tinh_sv }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Ngày sinh</th>
+                            <td>{{ SV.Ngay_sinh_sv }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Email</th>
+                            <td>{{ SV.Email_sv }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Mã lớp</th>
+                            <td>{{ lop.Ma_lop }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Điểm TBTL học kỳ mới nhất</th>
+                            <td>
+                                {% if latest_gpa %}
+                                    {{ latest_gpa }}
+                                {% else %}
+                                    Chưa có điểm TBTL được nhập vào.
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Mã học kỳ niên khóa</th>
+                            <td>
+                                {% if latest_hk_nien_khoa %}
+                                    {{ latest_hk_nien_khoa.Ma_hk_nien_khoa }}
+                                {% else %}
+                                    Chưa có thông tin về học kỳ niên khóa.
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <td>
+                <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#editModal_sv" 
+                        data-mssv="{{ SV.MSSV }}" data-hoten_sv="{{ SV.Ho_ten_sv }}" 
+                        data-dia_chi_sv="{{ SV.Dia_chi_sv }}" data-gioi_tinh_sv="{{ SV.Gioi_tinh_sv }}" 
+                        data-ngay_sinh_sv="{{ SV.Ngay_sinh_sv }}" data-email_sv="{{ SV.Email_sv }}" 
+                        data-ma_lop="{{ lop.Ma_lop }}">Sửa</button>
+            </td>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="successModal_edit" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="successModalLabel">Thông báo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Sửa thành công.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="editModal_sv" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Chỉnh sửa sinh viên</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" id="edit-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="edit-mssv">Mã số sinh viên</label>
+                        <input type="text" class="form-control" id="edit-mssv" name="MSSV" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-hoten_sv">Tên sinh viên</label>
+                        <input type="text" class="form-control" id="edit-hoten_sv" name="Ho_ten_sv">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-dia_chi_sv">Địa chỉ</label>
+                        <input type="text" class="form-control" id="edit-dia_chi_sv" name="Dia_chi_sv">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-gioi_tinh_sv">Giới tính</label>
+                        <input type="text" class="form-control" id="edit-gioi_tinh_sv" name="Gioi_tinh_sv">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-ngay_sinh_sv">Ngày sinh</label>
+                        <input type="date" class="form-control" id="edit-ngay_sinh_sv" name="Ngay_sinh_sv" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-email_sv">Email</label>
+                        <input type="text" class="form-control" id="edit-email_sv" name="Email_sv">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-ma_lop">Email</label>
+                        <input type="text" class="form-control" id="edit-ma_lop" name="Ma_lop" readonly>
+                    </div>
+                    <button type="submit" class="btn btn-primary" name="edit">Lưu</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

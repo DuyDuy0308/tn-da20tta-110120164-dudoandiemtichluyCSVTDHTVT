@@ -1,0 +1,98 @@
+{% extends "Sv_main.html" %}
+{% load static %}   
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách môn học</title>
+    <!-- Bootstrap CSS link (adjust the path according to your setup) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Danh sách môn học</h2>
+        
+        <!-- Form to select semester -->
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary mt-2">Chọn</button>
+        </form>
+        
+        <!-- Display courses and grades or prediction button -->
+        <div class="mt-4">
+            {% if mon_hoc_list %}
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Số thứ tự</th>
+                            <th scope="col">Tên môn học</th>
+                            <th scope="col">Điểm hệ 4</th>
+                            <th scope="col">Điểm hệ 10</th>
+                            <th scope="col">Điểm hệ 10 lần 2</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mon_hoc in mon_hoc_list %}
+                            {% if mon_hoc.co_diem %}
+                                <!-- In điểm nếu có -->
+                                <tr>
+                                    <td>{{ forloop.counter }}</td> 
+                                    <td>{{ mon_hoc.ten_mon_hoc }}</td>
+                                    <td>{{ mon_hoc.diem_he_4 }}</td>
+                                    <td>{{ mon_hoc.diem_he_10 }}</td>
+                                    <td>{{ mon_hoc.diem_he_10_lan_2 }}</td>
+                                    <td></td>
+                                </tr>
+                            {% else %}
+                                <!-- Nút dự đoán nếu chưa có điểm -->
+                                <tr>
+                                    <td>{{ forloop.counter }}</td> 
+                                    <td>{{ mon_hoc.ten_mon_hoc }}</td>
+                                    <td>Chưa có điểm</td>
+                                    <td>Chưa có điểm</td>
+                                    <td>Chưa có điểm</td>
+                                    <td></td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if all_no_diem %}
+                            <tr>
+                                <td colspan="5">
+                                    <form method="POST" action="{% url 'SV:compare_gpa' SV.MSSV %}">
+                                        {% csrf_token %}
+                                        {% for mon_hoc in mon_hoc_list %}
+                                            <input type="hidden" name="ma_mon_hoc" value="{{ mon_hoc.ma_mon_hoc }}">
+                                        {% endfor %}
+                                        <button type="submit" class="btn btn-primary">Dự đoán học kỳ</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% elif not all_co_diem %}
+                            <tr>
+                                <td colspan="5">
+                                    <form method="POST" action="{% url 'SV:compare_gpa' SV.MSSV %}">
+                                        {% csrf_token %}
+                                        {% for mon_hoc in mon_hoc_list %}
+                                            {% if not mon_hoc.co_diem %}
+                                                <input type="checkbox" name="ma_mon_hoc" value="{{ mon_hoc.ma_mon_hoc }}"> {{ mon_hoc.ten_mon_hoc }}<br>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <button type="submit" class="btn btn-primary">Dự đoán cho các môn đã chọn</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Không có môn học nào để hiển thị.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}

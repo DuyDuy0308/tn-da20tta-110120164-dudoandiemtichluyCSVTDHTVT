@@ -1,0 +1,166 @@
+{% extends "Sv_main.html" %}
+{% load static %}   
+{% block content %}
+
+<script>
+    // Kiểm tra nếu trang được reload lần thứ hai
+    if (performance.navigation.type === 1) {
+        // Kiểm tra xem đã có thông tin lần reload trước đó trong session chưa
+        if (sessionStorage.getItem('reloaded')) {
+            // Điều hướng người dùng về URL khác trong Django
+            window.location.href = "{% url 'SV:dudoandiem' SV.MSSV %}";
+        } else {
+            // Lưu thông tin đã reload lần đầu vào session
+            sessionStorage.setItem('reloaded', 'true');
+        }
+    }
+</script>
+{% block scripts %}
+<script>
+// Kiểm tra sự kiện khi trang được tải lại
+window.onload = function () {
+    if (window.history && window.history.pushState) {
+        window.history.pushState('forward', null, './#reload');
+        window.onpopstate = function () {
+            if (window.location.hash === '#reload') {
+                // Chuyển hướng người dùng đến một URL khác (ví dụ /home/)
+                window.location.href = "{% url 'SV:dudoandiem' SV.MSSV %}";
+            }
+        };
+    }
+};
+</script>
+{% endblock %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kết quả dự đoán</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        .plot-img {
+            width: 100%;
+            max-width: 1000px;
+            height: auto;
+        }
+        .stat-table td, .stat-table th {
+            vertical-align: middle;
+        }
+        .highlight-better {
+            background-color: #ffdddd; /* Light red background */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">Kết quả dự đoán cho sinh viên {{ SV.MSSV }}</h1>
+        
+        <!-- Linear Regression Results -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Hồi quy tuyến tính</h3>
+            </div>
+            <div class="card-body">
+                <table class="table stat-table">
+                    <tbody>
+                        <tr>
+                            <th scope="row">R2 Score:</th>
+                            <td>{{ linear_regression.r2_score }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Mean Squared Error:</th>
+                            <td>{{ linear_regression.mean_squared_error }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Kết quả dự đoán:</th>
+                            <td>{{ linear_regression.new_prediction }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><strong>Giải thích:</strong> 
+                    <ul>
+                        <li><strong>R2 Score:</strong> Là một thước đo thống kê biểu thị tỉ lệ phương sai của biến phụ thuộc có thể được giải thích bởi các biến độc lập. Giá trị R2 càng gần 1 thì mô hình càng tốt.</li>
+                        <li><strong>Mean Squared Error:</strong> Là trung bình của bình phương sai số giữa giá trị thực tế và giá trị dự đoán. Giá trị này càng nhỏ thì mô hình càng tốt.</li>
+                    </ul>
+                </p>
+                <img src="data:image/png;base64,{{ plot_lin }}" class="plot-img" alt="Biểu đồ hồi quy tuyến tính">
+            </div>
+        </div>
+        
+        <!-- Random Forest Results -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Mô hình Random Forest</h3>
+            </div>
+            <div class="card-body">
+                <table class="table stat-table">
+                    <tbody>
+                        <tr>
+                            <th scope="row">R2 Score:</th>
+                            <td>{{ random_forest.r2_score }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Mean Squared Error:</th>
+                            <td>{{ random_forest.mean_squared_error }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Kết quả dự đoán:</th>
+                            <td>{{ random_forest.new_prediction }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><strong>Giải thích:</strong> 
+                    <ul>
+                        <li><strong>R2 Score:</strong> Tương tự như hồi quy tuyến tính, R2 Score ở đây cũng biểu thị mức độ giải thích của mô hình đối với phương sai của biến phụ thuộc.</li>
+                        <li><strong>Mean Squared Error:</strong> Là trung bình của bình phương sai số giữa giá trị thực tế và giá trị dự đoán. Giá trị này càng nhỏ thì mô hình càng tốt.</li>
+                    </ul>
+                </p>
+                <img src="data:image/png;base64,{{ plot_rf }}" class="plot-img" alt="Biểu đồ Random Forest">
+            </div>
+        </div>
+
+        <!-- Comparison and Conclusion -->
+        <div class="card">
+            <div class="card-header">
+                <h3>So sánh và Kết luận</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>So sánh:</strong></p>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Thông số</th>
+                            <th>Hồi quy tuyến tính</th>
+                            <th>Random Forest</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>R2 Score</th>
+                            <td class="{% if linear_regression.r2_score > random_forest.r2_score %}highlight-better{% endif %}">{{ linear_regression.r2_score }}</td>
+                            <td class="{% if random_forest.r2_score > linear_regression.r2_score %}highlight-better{% endif %}">{{ random_forest.r2_score }}</td>
+                        </tr>
+                        <tr>
+                            <th>Mean Squared Error</th>
+                            <td class="{% if linear_regression.mean_squared_error < random_forest.mean_squared_error %}highlight-better{% endif %}">{{ linear_regression.mean_squared_error }}</td>
+                            <td class="{% if random_forest.mean_squared_error < linear_regression.mean_squared_error %}highlight-better{% endif %}">{{ random_forest.mean_squared_error }}</td>
+                        </tr>
+                        <tr>
+                            <th>Kết quả dự đoán</th>
+                            <td>{{ linear_regression.new_prediction }}</td>
+                            <td>{{ random_forest.new_prediction }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><strong>Kết luận:</strong> Từ các thông số trên, ta có thể thấy:</p>
+                <ul>
+                    <li>Nếu <strong>R2 Score</strong> của mô hình nào cao hơn và <strong>Mean Squared Error</strong> thấp hơn, thì mô hình đó có hiệu suất tốt hơn.</li>
+                    <li>Nên chọn mô hình có <strong>R2 Score</strong> gần 1 và <strong>Mean Squared Error</strong> thấp hơn.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}

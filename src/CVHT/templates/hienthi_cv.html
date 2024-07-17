@@ -1,0 +1,280 @@
+{% extends "cv_main.html" %}
+{% comment %} {% extends "cv_main.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-5">
+    <h4 class="mb-4">Danh sách lớp</h4>
+    <table class="table table-bordered">
+        <thead class="thead-info">
+            <tr>
+                <th scope="col">Số sinh viên</th> 
+                <th scope="col">Tên sinh viên</th>
+                <th scope="col">Mã lớp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lop in danh_sach_lop %}
+            <tr>
+                <td>{{ lop.MSSV }}</td>
+                <td>{{ lop.Ho_ten_sv }}</td>
+                <td>{{ lop.Ma_lop }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} {% endcomment %}
+
+
+{% load static %}   
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Danh sách sinh viên</h3>
+                </div>
+                <div class="card-body">
+                    <div class="container">
+                        <div class="container_popup">
+                            <button type="button" class="btn btn-primary btn_popup" data-toggle="modal" data-target="#popup1">
+                                Thêm sinh viên
+                            </button>
+                            <button type="button" class="btn btn-secondary btn_popup" data-toggle="modal" data-target="#popup2">
+                                Thêm sinh viên bằng file
+                            </button>
+                            <a href="{% static 'excel/mau_sv.xlsx' %}" class="btn btn-success btn_popup" role="button">
+                                Tải file mẫu Excel
+                            </a>
+                        </div>
+
+                        <div class="modal fade" id="popup1" tabindex="-1" role="dialog" aria-labelledby="popup1Label" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="popup1Label">Thêm sinh viên mới</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            {{ form_sinhvien.as_p }}
+                                            <button type="submit" class="btn btn-primary" name="add">Lưu</button>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table id="example1" class="table table-bordered table-striped">
+                            <form method="post" id="delete-form">
+                                {% csrf_token %}
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="select-all"></th>
+                                            <th>Mã số sinh viên</th>
+                                            <th>Tên sinh viên</th>
+                                            <th>Địa chỉ</th>
+                                            <th>Giới tính</th>
+                                            <th>Ngày sinh</th>
+                                            <th>Email</th>
+                                            <th>Mã lớp</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for sinhviens in danh_sach_lop %}
+                                        <tr>
+                                            <td><input type="checkbox" name="selected_ids" value="{{ sinhviens.MSSV }}"></td>
+                                            <td>{{ sinhviens.MSSV }}</td>
+                                            <td>{{ sinhviens.Ho_ten_sv }}</td>
+                                            <td>{{ sinhviens.Dia_chi_sv }}</td>
+                                            <td>{{ sinhviens.Gioi_tinh_sv }}</td>
+                                            <td>{{ sinhviens.Ngay_sinh_sv }}</td>
+                                            <td>{{ sinhviens.Email_sv }}</td>
+                                            <td>{{ sinhviens.Ma_lop }}</td>
+                                            
+                                            <td>
+                                                <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#editModal_sv" 
+                                                        data-mssv="{{ sinhviens.MSSV }}" data-hoten_sv="{{ sinhviens.Ho_ten_sv }}" 
+                                                        data-dia_chi_sv="{{ sinhviens.Dia_chi_sv }}" data-gioi_tinh_sv="{{ sinhviens.Gioi_tinh_sv }}" 
+                                                        data-ngay_sinh_sv="{{ sinhviens.Ngay_sinh_sv }}" data-email_sv="{{ sinhviens.Email_sv }}" 
+                                                        data-ma_lop="{{ sinhviens.Ma_lop }}">Sửa</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">Xóa</button>
+                            </form>
+
+                            <!-- Modal xác nhận xóa -->
+                            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Bạn có chắc chắn muốn xóa các dòng đã chọn?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                                            <button type="submit" class="btn btn-danger" form="delete-form" name="delete">Xóa</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal thành công khi xóa -->
+                            <div class="modal fade" id="successModal_delete" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="successModalLabel">Thông báo</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Xóa thành công các dòng đã chọn.
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal thành công khi chỉnh sửa -->
+                            <div class="modal fade" id="successModal_edit" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="successModalLabel">Thông báo</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Sửa thành công.
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal thành công khi thêm mới -->
+                            <div class="modal fade" id="addSuccessModal" tabindex="-1" role="dialog" aria-labelledby="addSuccessModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="addSuccessModalLabel">Thông báo</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Thêm thành công.
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a href="{% url 'CVHT:index' giang_viens.Id_cv %}" class="btn btn-secondary">Đóng</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal chỉnh sửa -->
+                            <div class="modal fade" id="editModal_sv" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="editModalLabel">Chỉnh sửa sinh viên</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form method="post" id="edit-form">
+                                                {% csrf_token %}
+                                                <div class="form-group">
+                                                    <label for="edit-mssv">Mã số sinh viên</label>
+                                                    <input type="text" class="form-control" id="edit-mssv" name="MSSV" readonly>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="edit-hoten_sv">Tên sinh viên</label>
+                                                    <input type="text" class="form-control" id="edit-hoten_sv" name="Ho_ten_sv">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="edit-dia_chi_sv">Địa chỉ</label>
+                                                    <input type="text" class="form-control" id="edit-dia_chi_sv" name="Dia_chi_sv">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="edit-gioi_tinh_sv">Giới tính</label>
+                                                    <input type="text" class="form-control" id="edit-gioi_tinh_sv" name="Gioi_tinh_sv">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="edit-ngay_sinh_sv">Ngày sinh</label>
+                                                    <input type="date" class="form-control" id="edit-ngay_sinh_sv" name="Ngay_sinh_sv" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="edit-email_sv">Email</label>
+                                                    <input type="text" class="form-control" id="edit-email_sv" name="Email_sv">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="edit-ma_lop">Mã lớp</label>
+                                                    <select id="edit-ma_lop" name="Ma_lop" required>
+                                                       {% for lops in lops %}
+                                                            <option value="{{ lops.Ma_lop }}">{{ lops.Ma_lop }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary" name="edit">Lưu</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal thêm bằng file -->
+                            <div class="modal fade" id="popup2" tabindex="-1" role="dialog" aria-labelledby="popup2Label" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="popup2Label">Thêm sinh viên bằng file</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form method="post" enctype="multipart/form-data" class="mt-3">
+                                                {% csrf_token %}
+                                                {{ form_file.as_p }}
+                                                <button type="submit" class="btn btn-primary" name="import">Upload</button>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+{% endblock %}
+

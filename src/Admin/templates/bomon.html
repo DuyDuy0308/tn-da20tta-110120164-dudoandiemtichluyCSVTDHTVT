@@ -1,0 +1,189 @@
+{% extends "main.html" %}
+{%block content%}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Danh sách bộ môn</h3>
+                </div>
+                <div class="card-body">
+                    <div class="card-body">
+                        <div class="container ">
+                            <div class="container container_popup">
+                                <button type="button" class="btn btn-primary btn_popup" data-toggle="modal" data-target="#popup1">
+                                   Thêm bộ môn
+                                </button>
+                            </div>
+                            <div class="modal fade" id="popup1" tabindex="-1" role="dialog" aria-labelledby="popup1Label" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="popup1Label">Thêm bộ môn mới</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form method="post" id="myForm">
+                                                {% csrf_token %}
+                                                {{ form_bomon.as_p }}
+                                                <button type="submit" class="btn btn-primary">Lưu</button>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <table id="example1" class="table table-bordered table-striped">
+                                <form method="post" id="delete-form">
+                                    {% csrf_token %}
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th><input type="checkbox" id="select-all"></th>
+                                                <th>Mã bộ môn</th>
+                                                <th>Tên bộ môn </th>
+                                                <th>Mã khoa</th>
+                                                <th>Hành động</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for bomons in bomons %}
+                                            <tr>
+                                                <td><input type="checkbox" name="selected_ids" value="{{ bomons.Ma_bo_mon }}"></td>
+                                                <td>{{ bomons.Ma_bo_mon }}</td>
+                                                <td>{{ bomons.Ten_bo_mon }}</td>
+                                                <td>{{ bomons.Ma_khoa }}</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#editModal_bomon" 
+                                                            data-ma_bomon="{{ bomons.Ma_bo_mon }}" data-ten_bomon="{{ bomons.Ten_bo_mon }}" data-ma_khoa="{{ bomons.Ma_khoa }}">Sửa</button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">Xóa</button>
+                                </form>
+                                <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Bạn có chắc chắn muốn xóa các dòng đã chọn?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                                                <button type="submit" class="btn btn-danger" form="delete-form" name="delete">Xóa</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal fade" id="successModal_delete" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="successModalLabel">Thông báo</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Xóa thành công các dòng đã chọn.
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal fade" id="successModal_edit" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="successModalLabel">Thông báo</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Sửa thành công.
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="modal fade" id="addSuccessModal" tabindex="-1" role="dialog" aria-labelledby="addSuccessModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="addSuccessModalLabel">Thông báo</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Thêm thành công.
+                                            </div>
+                                            <div class="modal-footer">
+                                                <a href="{% url 'bomon' %}" class="btn btn-secondary" > Đóng</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        
+                                <!-- Modal chỉnh sửa -->
+                                <div class="modal fade" id="editModal_bomon" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="editModal">Chỉnh sửa bộ môn</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form method="post" id="edit-form">
+                                                    {% csrf_token %}
+                                                    <div class="form-group">
+                                                        <label for="edit-ma_bo_mon">Mã bộ môn</label>
+                                                        <input type="text" class="form-control" id="edit-ma_bo_mon" name="Ma_bo_mon">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="edit-ten_bo_mon">Tên bộ môn</label>
+                                                        <input type="text" class="form-control" id="edit-ten_bo_mon" name="Ten_bo_mon">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="edit-ma_khoa">Mã khoa</label>
+                                                        <select id="edit-ma_khoa" name="Ma_khoa" required>
+                                                           {% for khoas in khoas %}
+                                                                <option value="{{ khoas.Ma_khoa }}">{{khoas.Ma_khoa}}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary" name="edit">Lưu</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </section>
+
+{%endblock%}
+        
