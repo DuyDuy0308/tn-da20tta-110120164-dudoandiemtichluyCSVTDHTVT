@@ -1,0 +1,50 @@
+{% extends "Sv_main.html" %}
+{% load static %}   
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả dự đoán</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Kết quả dự đoán cho sinh viên: {{ SV.Ho_ten_sv }}</h1>
+        <h2 class="text-center">Môn học: {{ mon_hoc_name }} ({{ ma_mon_hoc_input }})</h2>
+
+        <h3 class="mt-5">Kết quả dự đoán</h3>
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Phương pháp</th>
+                    <th>Dự đoán</th>
+                    <th>R <sup>2</sup></th>
+                    <th>MSE</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td>Linear Regression</td>
+                    <td>{{ result.lr_predictions }}</td>
+                    <td>{{ result.lr_r2 }}</td>
+                    <td>{{ result.lr_mse }}</td>
+                </tr>
+                <tr>
+                    <td>Random Forest</td>
+                    <td>{{ result.rf_predictions }}</td>
+                    <td>{{ result.rf_r2 }}</td>
+                    <td>{{ result.rf_mse }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+{% endblock %}

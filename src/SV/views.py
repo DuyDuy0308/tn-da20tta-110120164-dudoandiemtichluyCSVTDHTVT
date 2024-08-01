@@ -15,13 +15,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.preprocessing import LabelEncoder
-import joblib
-from django.contrib.auth.decorators import login_required
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+from sklearn.feature_selection import SelectKBest, f_regression
 from django.db.models import Sum
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib import messages
 def student_index(request, MSSV):
     SV = get_object_or_404(Sinhvien, MSSV=MSSV)
     bangdiems = Bangdiem.objects.filter(MSSV=SV)
@@ -122,392 +118,366 @@ def dudoan(request, MSSV):
     }
     return render(request, 'dudoan.html', context)
 # --------------------------------------------------------------------------------------------------------------------------------------------------
+from django.shortcuts import render, get_object_or_404
+from .models import Sinhvien, Bangdiem, Chitiet_bangdiem, Monhoc, thuoc_ctdt
+
 def dudoandiem(request, MSSV):
     SV = get_object_or_404(Sinhvien, MSSV=MSSV)
     hoc_ky_list = Bangdiem.objects.filter(MSSV=SV).values_list('Ma_hk_nien_khoa', flat=True).distinct()
     hoc_ky = request.GET.get('hoc_ky', None)
+    
     if hoc_ky:
         bangdiem_data = Bangdiem.objects.filter(MSSV=SV, Ma_hk_nien_khoa=hoc_ky)
     else:
         bangdiem_data = Bangdiem.objects.filter(MSSV=SV)
+    
+    all_monhoc_data = Monhoc.objects.all()
     combined_data = []
-    for bd in bangdiem_data:
-        ctbd_data = Chitiet_bangdiem.objects.filter(Ma_bang_diem=bd)
-        for ctbd in ctbd_data:
-            thuoc_ctdt_data = thuoc_ctdt.objects.filter(Ma_mon_hoc=ctbd.Ma_mon_hoc)
-            for tc in thuoc_ctdt_data:
-                mon_hoc = Monhoc.objects.get(pk=ctbd.Ma_mon_hoc.pk)
-                linh_vuc = mon_hoc.Linh_vuc
-                if linh_vuc is None:
-                    combined_data.append({
-                        'MSSV': SV.MSSV,
-                        'Ho_ten_sv': SV.Ho_ten_sv,
-                        'Ma_lop': SV.Ma_lop.Ma_lop,
-                        'Diem_he_4': bd.Diem_tich_luy_he_4,
-                        'Ma_mon_hoc': ctbd.Ma_mon_hoc.Ma_mon_hoc,
-                        'Ten_mon_hoc': ctbd.Ma_mon_hoc.Ten_mon_hoc,
-                        'Diem_he_10': ctbd.Diem_he_10,
-                        'Ma_HK_CTDT': tc.Ma_HK_CTDT.Ma_HK_CTDT,
-                        'Ten_HK_CTDT': tc.Ma_HK_CTDT.Ten_HK_CTDT,
-                        'Ma_loai_hp': tc.Ma_loai_hp.Ma_loai_hp,
-                        'Ten_loai_hp': tc.Ma_loai_hp.Ten_loai_hp,
-                        'Ma_nhom_mon': tc.Ma_nhom_mon.Ma_nhom_mon,
-                        'Ten_nhom_mon': tc.Ma_nhom_mon.Ten_nhom_mon,
-                        'Ma_CTDT': tc.Ma_CTDT.Ma_CTDT,
-                        'Ten_CTDT': tc.Ma_CTDT.Ten_CTDT,
-                    })
-                else:
-                    ctbd_linh_vuc = Chitiet_bangdiem.objects.filter(Ma_mon_hoc=linh_vuc, Ma_bang_diem__MSSV=SV).first()
-                    if ctbd_linh_vuc:
-                        combined_data.append({
-                            'MSSV': SV.MSSV,
-                            'Ho_ten_sv': SV.Ho_ten_sv,
-                            'Ma_lop': SV.Ma_lop.Ma_lop,
-                            'Diem_he_4': bd.Diem_tich_luy_he_4,
-                            'Ma_mon_hoc': ctbd.Ma_mon_hoc.Ma_mon_hoc,
-                            'Ten_mon_hoc': ctbd.Ma_mon_hoc.Ten_mon_hoc,
-                            'Linh_vuc': linh_vuc,
-                            'Diem_he_10': ctbd.Diem_he_10,
-                            'Diem_Linh_vuc': ctbd_linh_vuc.Diem_he_10,
-                            'Ma_HK_CTDT': tc.Ma_HK_CTDT.Ma_HK_CTDT,
-                            'Ten_HK_CTDT': tc.Ma_HK_CTDT.Ten_HK_CTDT,
-                            'Ma_loai_hp': tc.Ma_loai_hp.Ma_loai_hp,
-                            'Ten_loai_hp': tc.Ma_loai_hp.Ten_loai_hp,
-                            'Ma_nhom_mon': tc.Ma_nhom_mon.Ma_nhom_mon,
-                            'Ten_nhom_mon': tc.Ma_nhom_mon.Ten_nhom_mon,
-                            'Ma_CTDT': tc.Ma_CTDT.Ma_CTDT,
-                            'Ten_CTDT': tc.Ma_CTDT.Ten_CTDT,
-                        })
-                    else:
-                        combined_data.append({
-                            'MSSV': SV.MSSV,
-                            'Ho_ten_sv': SV.Ho_ten_sv,
-                            'Ma_lop': SV.Ma_lop.Ma_lop,
-                            'Diem_he_4': bd.Diem_tich_luy_he_4,
-                            'Ma_mon_hoc': ctbd.Ma_mon_hoc.Ma_mon_hoc,
-                            'Ten_mon_hoc': ctbd.Ma_mon_hoc.Ten_mon_hoc,
-                            'Linh_vuc': linh_vuc,
-                            'Diem_he_10': ctbd.Diem_he_10,
-                            'Diem_Linh_vuc': None,
-                            'Ma_HK_CTDT': tc.Ma_HK_CTDT.Ma_HK_CTDT,
-                            'Ten_HK_CTDT': tc.Ma_HK_CTDT.Ten_HK_CTDT,
-                            'Ma_loai_hp': tc.Ma_loai_hp.Ma_loai_hp,
-                            'Ten_loai_hp': tc.Ma_loai_hp.Ten_loai_hp,
-                            'Ma_nhom_mon': tc.Ma_nhom_mon.Ma_nhom_mon,
-                            'Ten_nhom_mon': tc.Ma_nhom_mon.Ten_nhom_mon,
-                            'Ma_CTDT': tc.Ma_CTDT.Ma_CTDT,
-                            'Ten_CTDT': tc.Ma_CTDT.Ten_CTDT,
-                        })
+    
+    for mon_hoc in all_monhoc_data:
+        linh_vuc = mon_hoc.Linh_vuc
+        ctbd_data = Chitiet_bangdiem.objects.filter(Ma_mon_hoc=mon_hoc, Ma_bang_diem__MSSV=SV)
+        
+        if ctbd_data.exists():
+            ctbd = ctbd_data.first()
+            bd = ctbd.Ma_bang_diem
+            thuoc_ctdt_data = thuoc_ctdt.objects.filter(Ma_mon_hoc=ctbd.Ma_mon_hoc, Ma_CTDT=SV.Ma_lop.Ma_CTDT).first()
+            combined_data.append({
+                'MSSV': SV.MSSV,
+                'Ho_ten_sv': SV.Ho_ten_sv,
+                'Ma_lop': SV.Ma_lop.Ma_lop,
+                'Diem_he_4': bd.Diem_tich_luy_he_4 if bd else None,
+                'Ma_mon_hoc': mon_hoc.Ma_mon_hoc,
+                'Ten_mon_hoc': mon_hoc.Ten_mon_hoc,
+                'Linh_vuc': linh_vuc,
+                'Diem_he_10': ctbd.Diem_he_10 if ctbd else None,
+                'Ma_HK_CTDT': thuoc_ctdt_data.Ma_HK_CTDT.Ma_HK_CTDT if thuoc_ctdt_data else None,
+                'Ten_HK_CTDT': thuoc_ctdt_data.Ma_HK_CTDT.Ten_HK_CTDT if thuoc_ctdt_data else None,
+                'Ma_loai_hp': thuoc_ctdt_data.Ma_loai_hp.Ma_loai_hp if thuoc_ctdt_data else None,
+                'Ten_loai_hp': thuoc_ctdt_data.Ma_loai_hp.Ten_loai_hp if thuoc_ctdt_data else None,
+                'Ma_nhom_mon': thuoc_ctdt_data.Ma_nhom_mon.Ma_nhom_mon if thuoc_ctdt_data else None,
+                'Ten_nhom_mon': thuoc_ctdt_data.Ma_nhom_mon.Ten_nhom_mon if thuoc_ctdt_data else None,
+                'Ma_CTDT': thuoc_ctdt_data.Ma_CTDT.Ma_CTDT if thuoc_ctdt_data else None,
+                'Ten_CTDT': thuoc_ctdt_data.Ma_CTDT.Ten_CTDT if thuoc_ctdt_data else None,
+            })
+        else:
+            thuoc_ctdt_data = thuoc_ctdt.objects.filter(Ma_mon_hoc=mon_hoc, Ma_CTDT=SV.Ma_lop.Ma_CTDT).first()
+            combined_data.append({
+                'MSSV': SV.MSSV,
+                'Ho_ten_sv': SV.Ho_ten_sv,
+                'Ma_lop': SV.Ma_lop.Ma_lop,
+                'Diem_he_4': None,
+                'Ma_mon_hoc': mon_hoc.Ma_mon_hoc,
+                'Ten_mon_hoc': mon_hoc.Ten_mon_hoc,
+                'Linh_vuc': linh_vuc,
+                'Diem_he_10': None,
+                'Diem_Linh_vuc': None,
+                'Ma_HK_CTDT': thuoc_ctdt_data.Ma_HK_CTDT.Ma_HK_CTDT if thuoc_ctdt_data else None,
+                'Ten_HK_CTDT': thuoc_ctdt_data.Ma_HK_CTDT.Ten_HK_CTDT if thuoc_ctdt_data else None,
+                'Ma_loai_hp': thuoc_ctdt_data.Ma_loai_hp.Ma_loai_hp if thuoc_ctdt_data else None,
+                'Ten_loai_hp': thuoc_ctdt_data.Ma_loai_hp.Ten_loai_hp if thuoc_ctdt_data else None,
+                'Ma_nhom_mon': thuoc_ctdt_data.Ma_nhom_mon.Ma_nhom_mon if thuoc_ctdt_data else None,
+                'Ten_nhom_mon': thuoc_ctdt_data.Ma_nhom_mon.Ten_nhom_mon if thuoc_ctdt_data else None,
+                'Ma_CTDT': thuoc_ctdt_data.Ma_CTDT.Ma_CTDT if thuoc_ctdt_data else None,
+                'Ten_CTDT': thuoc_ctdt_data.Ma_CTDT.Ten_CTDT if thuoc_ctdt_data else None,
+            })
     
     context = {
-        'SV' : SV,
+        'SV': SV,
         'combined_data': combined_data,
         'hoc_ky_list': hoc_ky_list,
         'selected_hoc_ky': hoc_ky,
         'MSSV': MSSV,
     }
     return render(request, 'dudoandiem.html', context)
+
 # ------------------------------------------------------------------------------------------------------------------------------------------------------
-def predict(request, MSSV):
-    df = pd.read_csv('file.csv')
-    df.dropna(inplace=True)
-    X = df[['Ma_mon_hoc', 'Diem_he_10', 'Linh_vuc']]
-    y = df['Diem_Linh_vuc']
-
-    lin_reg = LinearRegression()
-    lin_reg.fit(X, y)
-    y_pred_lin = lin_reg.predict(X)
-    r2_lin = r2_score(y, y_pred_lin)
-    mse_lin = mean_squared_error(y, y_pred_lin)
-
-    rf_reg = RandomForestRegressor()
-    rf_reg.fit(X, y)
-    y_pred_rf = rf_reg.predict(X)
-    r2_rf = r2_score(y, y_pred_rf)
-    mse_rf = mean_squared_error(y, y_pred_rf)
-
-    # Vẽ biểu đồ Hồi quy tuyến tính
-    plt.figure(figsize=(12, 6))
-    plt.scatter(y, y_pred_lin, label='Dự đoán')
-    plt.plot([y.min(), y.max()], [y.min(), y.max()], 'k--', lw=4, label='Hồi quy tuyến tính')
-    plt.title('Biểu đồ hồi quy tuyến tính bội')
-    plt.xlabel('Thực tế')
-    plt.ylabel('Dự đoán')
-    plt.legend()
-
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    buf.seek(0)
-    image_base64_lin = base64.b64encode(buf.read()).decode('utf-8')
-    buf.close()
-
-    # Clear figure để vẽ biểu đồ Random Forest
-    plt.clf()
-
-    # Vẽ biểu đồ Random Forest
-    plt.figure(figsize=(12, 6))
-    plt.scatter(range(len(y)), y, label='Thực tế')
-    plt.scatter(range(len(y)), y_pred_rf, label='Dự đoán')
-    plt.title('Biểu đồ Random Forest')
-    plt.xlabel('Index')
-    plt.ylabel('Diem_Linh_vuc')
-    plt.legend()
-
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    buf.seek(0)
-    image_base64_rf = base64.b64encode(buf.read()).decode('utf-8')
-    buf.close()
-
-    SV = get_object_or_404(Sinhvien, MSSV=MSSV)
-
-    if request.method == 'POST':
-        ma_mon_hoc_input = request.POST.get('ma_mon_hoc')
-        diem_he_10_input = float(request.POST.get('diem'))
-        linh_vuc_input = request.POST.get('linh_vuc')
-
-        new_data = pd.DataFrame([[ma_mon_hoc_input, diem_he_10_input, linh_vuc_input]],
-                                columns=['Ma_mon_hoc', 'Diem_he_10', 'Linh_vuc'])
-
-        # Dự đoán
-        new_pred_lin = lin_reg.predict(new_data)
-        new_pred_rf = rf_reg.predict(new_data)
-
-        context = {
-            'SV': SV,
-            'linear_regression': {
-                'coefficients': lin_reg.coef_.tolist(),
-                'intercept': lin_reg.intercept_,
-                'r2_score': r2_lin,
-                'mean_squared_error': mse_lin,
-                'new_prediction': new_pred_lin[0]
-            },
-            'random_forest': {
-                'r2_score': r2_rf,
-                'mean_squared_error': mse_rf,
-                'new_prediction': new_pred_rf[0]
-            },
-            'plot_lin': image_base64_lin,
-            'plot_rf': image_base64_rf
-        }
-        return render(request, 'ketqua.html', context)
-
-    context = {
-        'SV': SV,
-        'linear_regression': {
-            'coefficients': lin_reg.coef_.tolist(),
-            'intercept': lin_reg.intercept_,
-            'r2_score': r2_lin,
-            'mean_squared_error': mse_lin
-        },
-        'random_forest': {
-            'r2_score': r2_rf,
-            'mean_squared_error': mse_rf
-        },
-        'plot_lin': image_base64_lin,
-        'plot_rf': image_base64_rf
-    }
-
-    return render(request, 'ketqua.html', context)
-#-------------------------------------------------------------------------------------------------------------------------------------
-def hoc_ky_mon_hoc_view(request, MSSV):
-    SV = Sinhvien.objects.get(MSSV=MSSV)
-    bd = Bangdiem.objects.filter(MSSV=SV)
-    mon_hoc_list = []
-    
-    current_bangdiem = Bangdiem.objects.filter(MSSV=MSSV).order_by('-Ma_bang_diem').first()
-    current_gpa = current_bangdiem.Diem_tich_luy_he_4 if current_bangdiem else "Không có dữ liệu"
-    if request.method == 'POST':
-        form = HockySelectForm(request.POST)
-        if form.is_valid():
-            ma_hk_ctdt = form.cleaned_data['Ma_HK_CTDT']
-            
-            # Lấy danh sách các môn học liên quan đến kỳ CTĐT đã chọn
-            thuoc_ctdt_records = thuoc_ctdt.objects.filter(Ma_HK_CTDT=ma_hk_ctdt)
-            ma_mon_hoc_list = [record.Ma_mon_hoc_id for record in thuoc_ctdt_records]
-            
-            # Lọc chi tiết bảng điểm theo bảng điểm và môn học đã chọn
-            for bangdiem in bd:
-                chi_tiet_bangdiem = Chitiet_bangdiem.objects.filter(Ma_bang_diem=bangdiem, Ma_mon_hoc_id__in=ma_mon_hoc_list)
-                for ctbd in chi_tiet_bangdiem:
-                    mon_hoc = Monhoc.objects.get(Ma_mon_hoc=ctbd.Ma_mon_hoc_id)
-                    mon_hoc_list.append({
-                        'ma_mon_hoc': mon_hoc.Ma_mon_hoc,
-                        'ten_mon_hoc': mon_hoc.Ten_mon_hoc,
-                        'diem_he_4': ctbd.Diem_he_4,
-                        'diem_he_10': ctbd.Diem_he_10,
-                        'diem_he_10_lan_2': ctbd.Diem_he_10_lan_2,
-                        'co_diem': True,  # Đánh dấu môn đã có điểm
-                    })
-            
-            # Lấy danh sách các môn học chưa có điểm
-            mon_hoc_all = Monhoc.objects.filter(Ma_mon_hoc__in=ma_mon_hoc_list).exclude(Ma_mon_hoc__in=[mh['ma_mon_hoc'] for mh in mon_hoc_list])
-            for mon_hoc in mon_hoc_all:
-                mon_hoc_list.append({
-                    'ma_mon_hoc': mon_hoc.Ma_mon_hoc,
-                    'ten_mon_hoc': mon_hoc.Ten_mon_hoc,
-                    'diem_he_4': None,
-                    'diem_he_10': None,
-                    'diem_he_10_lan_2': None,
-                    'co_diem': False,  # Đánh dấu môn chưa có điểm
-                })
-    else:
-        form = HockySelectForm()
+# from sklearn.feature_selection import SelectKBest, f_regression
+# from sklearn.preprocessing import StandardScaler
+# from sklearn.impute import SimpleImputer
+# df = pd.read_csv('DA19TT_he10.csv')
+# def predict(request, MSSV):
+#     SV = get_object_or_404(Sinhvien, MSSV=MSSV)
+#     df.fillna(df.mean(), inplace=True)
+#     if request.method == 'POST':
+#         target_column = request.POST.get('linh_vuc')
         
-    all_co_diem = all(mon_hoc['co_diem'] for mon_hoc in mon_hoc_list)
-    all_no_diem = all(not mon_hoc['co_diem'] for mon_hoc in mon_hoc_list)
-    context = {
-        'SV': SV,
-        'mon_hoc_list': mon_hoc_list,
-        'current_gpa': current_gpa,
-        'form': form,
-        'all_no_diem': all_no_diem,
-        'all_co_diem': all_co_diem
-    }
-    return render(request, 'hoc_ky_mon_hoc.html', context)
+#         # Chọn dữ liệu cho đặc trưng và nhãn
+#         X = df.drop(columns=['110002'])
+#         y = df['110002']
+        
+#         # Kiểm tra và xử lý dữ liệu bị thiếu
+#         imputer = SimpleImputer(strategy='mean')
+#         X = imputer.fit_transform(X)
+#         y = y.fillna(y.mean())
+        
+#         # Chuẩn hóa dữ liệu
+#         scaler = StandardScaler()
+#         X = scaler.fit_transform(X)
+        
+#         # Chia tách dữ liệu thành tập huấn luyện và tập kiểm tra
+#         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        
+#         # Chọn 5 đặc trưng tốt nhất trên tập huấn luyện
+#         selector = SelectKBest(score_func=f_regression, k=5)
+#         X_train_selected = selector.fit_transform(X_train, y_train)
+#         X_test_selected = selector.transform(X_test)
+        
+#         # Kiểm tra kết quả của SelectKBest
+#         print("X_train_selected:", X_train_selected)
+#         print("X_test_selected:", X_test_selected)
+        
+#         # Huấn luyện mô hình Linear Regression
+#         lin_reg = LinearRegression()
+#         lin_reg.fit(X_train_selected, y_train)
+#         y_pred_lin = lin_reg.predict(X_test_selected)
+#         r2_lin = r2_score(y_test, y_pred_lin)
+#         mse_lin = mean_squared_error(y_test, y_pred_lin)
+        
+#         print("Linear Regression R2:", r2_lin)
+#         print("Linear Regression MSE:", mse_lin)
+#         print("Linear Regression Predictions:", y_pred_lin)
+        
+#         # Huấn luyện mô hình Random Forest Regressor
+#         rf_reg = RandomForestRegressor()
+#         rf_reg.fit(X_train_selected, y_train)
+#         y_pred_rf = rf_reg.predict(X_test_selected)
+#         r2_rf = r2_score(y_test, y_pred_rf)
+#         mse_rf = mean_squared_error(y_test, y_pred_rf)
+        
+#         print("Random Forest R2:", r2_rf)
+#         print("Random Forest MSE:", mse_rf)
+#         print("Random Forest Predictions:", y_pred_rf)
 
+
+#         context = {
+#             'SV': SV,
+#             'linear_regression': {
+#                 'coefficients': lin_reg.coef_.tolist(),
+#                 'intercept': lin_reg.intercept_,
+#                 'r2_score': r2_lin,
+#                 'mean_squared_error': mse_lin,
+#             },
+#             'random_forest': {
+#                 'r2_score': r2_rf,
+#                 'mean_squared_error': mse_rf,
+#             },
+           
+#         }
+#         return render(request, 'ketqua.html', context)
+
+    
+
+#     return render(request, 'ketqua.html', context)
 #-------------------------------------------------------------------------------------------------------------------------------------
-from django.shortcuts import render
-from django.db.models import Avg
+# def predict(request, MSSV):
+#     dfnew = pd.read_csv('dlm_data.csv')
+    
+#     df = dfnew[['Diem_he_10', 'Diem_Linh_vuc']]
+#     df.dropna(inplace=True)
+#     df = dfnew[(dfnew['Ma_mon_hoc'] == 110000) & (dfnew['Linh_vuc'] == 110002)]
+#     X = df[['Diem_he_10']]
+#     y = df['Diem_Linh_vuc']
+
+#     lin_reg = LinearRegression()
+#     lin_reg.fit(X, y)
+#     y_pred_lin = lin_reg.predict(X)
+#     r2_lin = r2_score(y, y_pred_lin)
+#     mse_lin = mean_squared_error(y, y_pred_lin)
+
+#     rf_reg = RandomForestRegressor()
+#     rf_reg.fit(X, y)
+#     y_pred_rf = rf_reg.predict(X)
+#     r2_rf = r2_score(y, y_pred_rf)
+#     mse_rf = mean_squared_error(y, y_pred_rf)
+
+#     # Vẽ biểu đồ Hồi quy tuyến tính
+#     plt.figure(figsize=(12, 6))
+#     plt.scatter(y, y_pred_lin, label='Dự đoán')
+#     plt.plot([y.min(), y.max()], [y.min(), y.max()], 'k--', lw=4, label='Hồi quy tuyến tính')
+#     plt.title('Biểu đồ hồi quy tuyến tính bội')
+#     plt.xlabel('Thực tế')
+#     plt.ylabel('Dự đoán')
+#     plt.legend()
+
+#     buf = io.BytesIO()
+#     plt.savefig(buf, format='png')
+#     buf.seek(0)
+#     image_base64_lin = base64.b64encode(buf.read()).decode('utf-8')
+#     buf.close()
+
+#     # Clear figure để vẽ biểu đồ Random Forest
+#     plt.clf()
+
+#     # Vẽ biểu đồ Random Forest
+#     plt.figure(figsize=(12, 6))
+#     plt.scatter(range(len(y)), y, label='Thực tế')
+#     plt.scatter(range(len(y)), y_pred_rf, label='Dự đoán')
+#     plt.title('Biểu đồ Random Forest')
+#     plt.xlabel('Index')
+#     plt.ylabel('Diem_Linh_vuc')
+#     plt.legend()
+
+#     buf = io.BytesIO()
+#     plt.savefig(buf, format='png')
+#     buf.seek(0)
+#     image_base64_rf = base64.b64encode(buf.read()).decode('utf-8')
+#     buf.close()
+
+#     SV = get_object_or_404(Sinhvien, MSSV=MSSV)
+
+#     if request.method == 'POST':
+#         diem_he_10_input = float(request.POST.get('diem'))
+
+#         new_data = pd.DataFrame([ diem_he_10_input],
+#                                 columns=['Diem_he_10'])
+
+#         # Dự đoán
+#         new_pred_lin = lin_reg.predict(new_data)
+#         new_pred_rf = rf_reg.predict(new_data)
+
+#         context = {
+#             'SV': SV,
+#             'linear_regression': {
+#                 'coefficients': lin_reg.coef_.tolist(),
+#                 'intercept': lin_reg.intercept_,
+#                 'r2_score': r2_lin,
+#                 'mean_squared_error': mse_lin,
+#                 'new_prediction': new_pred_lin[0]
+#             },
+#             'random_forest': {
+#                 'r2_score': r2_rf,
+#                 'mean_squared_error': mse_rf,
+#                 'new_prediction': new_pred_rf[0]
+#             },
+#             'plot_lin': image_base64_lin,
+#             'plot_rf': image_base64_rf
+#         }
+#         return render(request, 'ketqua.html', context)
+
+#     context = {
+#         'SV': SV,
+#         'linear_regression': {
+#             'coefficients': lin_reg.coef_.tolist(),
+#             'intercept': lin_reg.intercept_,
+#             'r2_score': r2_lin,
+#             'mean_squared_error': mse_lin
+#         },
+#         'random_forest': {
+#             'r2_score': r2_rf,
+#             'mean_squared_error': mse_rf
+#         },
+#         'plot_lin': image_base64_lin,
+#         'plot_rf': image_base64_rf
+#     }
+
+#     return render(request, 'ketqua.html', context)
+# ------------------------------------------------------------------------------------------------------------------------------------
+import pandas as pd
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
+from .models import Sinhvien, Monhoc, thuoc_ctdt
+from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import r2_score, mean_squared_error
-import pandas as pd
-from .models import Sinhvien, Bangdiem, Chitiet_bangdiem
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+from sklearn.impute import SimpleImputer
+from sklearn.feature_selection import SelectKBest, f_regression
 
-def compare_gpa_view(request, MSSV):
-    SV = Sinhvien.objects.get(MSSV=MSSV)
-    current_bangdiem = Bangdiem.objects.filter(MSSV=MSSV).order_by('-Ma_bang_diem').first()
+def predict(request, MSSV):
+    SV = get_object_or_404(Sinhvien, MSSV=MSSV)
+    data = pd.read_csv('DA19TT_he10.csv')
+    imputer = SimpleImputer(strategy='mean')
+    data_daloc = pd.DataFrame(imputer.fit_transform(data), columns=data.columns)
     
-    if current_bangdiem:
-        current_gpa_str = current_bangdiem.Diem_tich_luy_he_4
+    if request.method == 'POST':
         try:
-            current_gpa = float(current_gpa_str)
-        except ValueError:
-            current_gpa = None
-    else:
-        current_gpa = None
-    
-    # Chia điểm tích lũy hệ 4 thành 8 khung điểm
-    gpa_ranges = {
-        '0.0-1.0': [],
-        '1.0-1.5': [],
-        '1.5-2.0': [],
-        '2.0-2.5': [],
-        '2.5-3.0': [],
-        '3.0-3.5': [],
-        '3.5-4.0': [],
-    }
-
-    ma_mon_hocs = []
-
-    if request.method == "POST":
-        ma_mon_hocs = request.POST.getlist('ma_mon_hoc')
-    average_linear_reg = 0
-    average_random_forest = 0
-    average_scores = {}
-    if current_gpa is not None:
-        for range_key in gpa_ranges:
-            range_start, range_end = map(float, range_key.split('-'))
-            if range_start <= current_gpa < range_end:
-                condition = Q(Diem_tich_luy_he_4__gte=range_start) & Q(Diem_tich_luy_he_4__lt=range_end)
-                bangdiem_list = Bangdiem.objects.filter(condition)
-                
-                for ma_mon_hoc in ma_mon_hocs:
-                    avg_score = Chitiet_bangdiem.objects.filter(
-                        Ma_bang_diem__in=bangdiem_list,
-                        Ma_mon_hoc=ma_mon_hoc
-                    ).aggregate(Avg('Diem_he_10'))['Diem_he_10__avg']
-                    
-                    if avg_score is not None:
-                        avg_score = round(avg_score, 1)
-                    average_scores[ma_mon_hoc] = avg_score
-
-                gpa_ranges[range_key] = bangdiem_list
-                break
-
-    df = pd.read_csv('monhoc_diem10.csv')
-    df.dropna(inplace=True)
-    X = df[['Ma_mon_hoc']]
-    y = df['Diem_he_10']
-
-    # Huấn luyện mô hình hồi quy tuyến tính
-    lin_reg = LinearRegression()
-    lin_reg.fit(X, y)
-    y_pred_lin = lin_reg.predict(X)
-    r2_lin = r2_score(y, y_pred_lin)
-    mse_lin = mean_squared_error(y, y_pred_lin)
-
-    # Huấn luyện mô hình rừng ngẫu nhiên
-    rf_reg = RandomForestRegressor()
-    rf_reg.fit(X, y)
-    y_pred_rf = rf_reg.predict(X)
-    r2_rf = r2_score(y, y_pred_rf)
-    mse_rf = mean_squared_error(y, y_pred_rf)
-
-    # Dự đoán với từng mã môn học
-    linear_reg_results = []
-    random_forest_results = []
-
-    for ma_mon_hoc in ma_mon_hocs:
-        avg_score = average_scores.get(ma_mon_hoc)
-        if avg_score is not None:
-            new_data = pd.DataFrame({'Ma_mon_hoc': [ma_mon_hoc], 'Diem_he_10': [avg_score]})
+            ma_mon_hoc_input = request.POST.get('ma_mon_hoc')
             
-            # Dự đoán với mô hình hồi quy tuyến tính
-            new_pred_lin = lin_reg.predict(new_data[['Ma_mon_hoc']])
-            linear_reg_results.append({
-                'ma_mon_hoc': ma_mon_hoc,
-                'new_prediction': new_pred_lin[0] if len(new_pred_lin) > 0 else None
+            if ma_mon_hoc_input not in data_daloc.columns:
+                raise KeyError(f"Mã môn học '{ma_mon_hoc_input}' không tồn tại trong dữ liệu.")
+            
+            monhoc = get_object_or_404(Monhoc, Ma_mon_hoc=ma_mon_hoc_input)
+            hocky = thuoc_ctdt.objects.filter(Ma_mon_hoc=monhoc).values_list('Ma_HK_CTDT', flat=True).first()
+            
+            if not hocky:
+                raise KeyError(f"Kỳ học của mã môn '{ma_mon_hoc_input}' không tìm thấy trong cơ sở dữ liệu.")
+            
+            # Tất cả các môn học thuộc kỳ học đó trở về trước
+            monhoctontai = thuoc_ctdt.objects.filter(Ma_HK_CTDT__lte=hocky).values_list('Ma_mon_hoc', flat=True).distinct()
+            cot = [col for col in data.columns if col in monhoctontai]
+            
+            if ma_mon_hoc_input not in cot:
+                raise KeyError(f"Mã môn học '{ma_mon_hoc_input}' không có trong dữ liệu CSV sau khi lọc.")
+            data_filtered = data_daloc[cot]
+            results = []
+
+            # Linear Regression
+            X_lr = data_filtered.drop(columns=ma_mon_hoc_input)
+            y_lr = data_filtered[ma_mon_hoc_input]
+            X_train_lr, X_test_lr, y_train_lr, y_test_lr = train_test_split(X_lr, y_lr, test_size=0.3, random_state=42)
+
+            selector_lr = SelectKBest(score_func=f_regression, k=9)
+            selector_lr.fit(X_train_lr, y_train_lr)
+            top_k_feature_names_lr = [X_lr.columns[i] for i in selector_lr.get_support(indices=True)]
+
+            lr_model = LinearRegression()
+            lr_model.fit(X_train_lr[top_k_feature_names_lr], y_train_lr)
+            lr_predictions = lr_model.predict(X_test_lr[top_k_feature_names_lr])
+
+            lr_r2 = r2_score(y_test_lr, lr_predictions)
+            lr_mae = mean_absolute_error(y_test_lr, lr_predictions)
+            lr_mse = mean_squared_error(y_test_lr, lr_predictions)
+                
+            # Random Forest
+            X_rf = data_filtered.drop(columns=ma_mon_hoc_input)
+            y_rf = data_filtered[ma_mon_hoc_input]
+            X_train_rf, X_test_rf, y_train_rf, y_test_rf = train_test_split(X_rf, y_rf, test_size=0.3, random_state=42)
+
+            selector_rf = SelectKBest(score_func=f_regression, k=9)
+            selector_rf.fit(X_train_rf, y_train_rf)
+            top_k_feature_names_rf = [X_rf.columns[i] for i in selector_rf.get_support(indices=True)]
+
+            rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+            rf_model.fit(X_train_rf[top_k_feature_names_rf], y_train_rf)
+            rf_predictions = rf_model.predict(X_test_rf[top_k_feature_names_rf])
+
+            rf_r2 = r2_score(y_test_rf, rf_predictions)
+            rf_mae = mean_absolute_error(y_test_rf, rf_predictions)
+            rf_mse = mean_squared_error(y_test_rf, rf_predictions)
+            
+            lr_sample_prediction = lr_predictions[0] if len(lr_predictions) > 0 else None
+            rf_sample_prediction = rf_predictions[0] if len(rf_predictions) > 0 else None
+
+            results.append({
+                'top_features_lr': top_k_feature_names_lr,
+                'lr_predictions': lr_sample_prediction,
+                'lr_r2': lr_r2,
+                'lr_mae': lr_mae,
+                'lr_mse': lr_mse,
+                'top_features_rf': top_k_feature_names_rf,
+                'rf_predictions': rf_sample_prediction,
+                'rf_r2': rf_r2,
+                'rf_mae': rf_mae,
+                'rf_mse': rf_mse
             })
+            
+            mon_hoc_name = Monhoc.objects.filter(Ma_mon_hoc=ma_mon_hoc_input).first()
+            mon_hoc_name = mon_hoc_name.Ten_mon_hoc if mon_hoc_name else "Không xác định"
+            
+            context = {
+                'ma_mon_hoc_input': ma_mon_hoc_input,
+                'mon_hoc_name': mon_hoc_name,
+                'results': results,
+                'SV': SV,
+                'top_features_lr': top_k_feature_names_lr,
+                'top_features_rf': top_k_feature_names_rf
+            }
 
-            # Dự đoán với mô hình rừng ngẫu nhiên
-            new_pred_rf = rf_reg.predict(new_data[['Ma_mon_hoc']])
-            random_forest_results.append({
-                'ma_mon_hoc': ma_mon_hoc,
-                'new_prediction': new_pred_rf[0] if len(new_pred_rf) > 0 else None
-            })
-        def convert_to_gpa_range(score):
-            if 9.0 <= score <= 10.0:
-                return 4
-            elif 8.0 <= score < 9.0:
-                return 3.5
-            elif 7.0 <= score < 8.0:
-                return 3
-            elif 6.5 <= score < 7.0:
-                return 2.5
-            elif 5.5 <= score < 6.5:
-                return 2
-            elif 5.0 <= score < 5.5:
-                return 1.5
-            elif 4.0 <= score < 5.0:
-                return 1
-            else:
-                return 0
+            return render(request, 'predict_results.html', context)
+        except KeyError as e:
+            return HttpResponse(f"Lỗi: {str(e)}", content_type="text/plain")
+    
+    return render(request, 'predict_form.html', {'SV': SV})
 
-        linear_reg_converted = [convert_to_gpa_range(res['new_prediction']) for res in linear_reg_results if res['new_prediction'] is not None]
-        random_forest_converted = [convert_to_gpa_range(res['new_prediction']) for res in random_forest_results if res['new_prediction'] is not None]
-
-        average_linear_reg = sum(linear_reg_converted) / len(linear_reg_converted) if linear_reg_converted else 0
-        average_random_forest = sum(random_forest_converted) / len(random_forest_converted) if random_forest_converted else 0
-    context = {
-        'SV': SV,
-        'current_gpa': current_gpa,
-        'linear_regression_results': linear_reg_results,
-        'random_forest_results': random_forest_results,
-        'average_linear_reg': average_linear_reg,
-        'average_random_forest': average_random_forest,
-        'linear_regression': {
-            'coefficients': lin_reg.coef_.tolist(),
-            'intercept': lin_reg.intercept_,
-            'r2_score': r2_lin,
-            'mean_squared_error': mse_lin,
-        },
-        'random_forest': {
-            'r2_score': r2_rf,
-            'mean_squared_error': mse_rf,
-        },
-        'average_scores': average_scores,
-    }
-
-    return render(request, 'dudoanky.html', context)
+# ------------------------------------------------------------------------------------------------------------------------

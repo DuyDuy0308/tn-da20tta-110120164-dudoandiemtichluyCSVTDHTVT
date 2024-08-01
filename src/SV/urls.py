@@ -9,6 +9,5 @@ urlpatterns = [
     path('dudoan/<str:MSSV>/', views.dudoan, name='dudoan'),
     path('dudoandiem/<str:MSSV>/', views.dudoandiem, name='dudoandiem'),
     path('predict/<str:MSSV>/', views.predict, name='predict'),
-    path('hoc_ky_mon_hoc/<str:MSSV>/', views.hoc_ky_mon_hoc_view, name='hoc_ky_mon_hoc'),
-    path('compare-gpa/<str:MSSV>/', views.compare_gpa_view, name='compare_gpa'),
+    # path('train/', views.train_and_save_models_view, name='train_and_save_models_view'),
 ]

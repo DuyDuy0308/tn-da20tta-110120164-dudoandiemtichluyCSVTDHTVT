@@ -27,13 +27,10 @@
         
         <table class="table">
             <thead class="thead-dark">
-                <tr>
+                <tr><th scope="col">STT</th>
                     <th scope="col">Mã môn học</th>
                     <th scope="col">Tên môn học</th>
                     <th scope="col">Điểm hệ 10</th>
-                    <th scope="col">Môn tiên quyết</th>
-                    <th scope="col">Tên môn tiên quyết</th>
-                    <th scope="col">Điểm môn tiên quyết</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,18 +39,17 @@
                         <td>{{ forloop.counter }}</td>
                         <td>{{ item.Ma_mon_hoc }}</td>
                         <td>{{ item.Ten_mon_hoc }}</td>
-                        <td>{{ item.Diem_he_10 }}</td>
-                        <td>{{ item.Linh_vuc }}</td>
-                        <td>{{ item.Linh_vuc.Ten_mon_hoc }}</td>
+                        {% comment %} <td>{{ item.Linh_vuc }}</td>
+                        <td>{{ item.Linh_vuc.Ten_mon_hoc }}</td> {% endcomment %}
                         <td>
-                            {% if item.Linh_vuc and item.Diem_Linh_vuc is None %}
+                            {% if item.Ma_mon_hoc and item.Diem_he_10 is None %}
                                 <a href="#" class="btn btn-outline-primary btn-sm predict-btn"
                                    data-mamonhoc="{{ item.Ma_mon_hoc }}"
                                    data-diem="{{ item.Diem_he_10 }}"
-                                   data-linhvuc="{{ item.Linh_vuc }}"
-                                   data-tenlinhvuc="{{ item.Linh_vuc.Ten_mon_hoc }}">Dự đoán</a>
-                            {% elif item.Linh_vuc %}
-                                {{ item.Diem_Linh_vuc }}
+                                   data-linhvuc="{{ item.Ten_mon_hoc }}"
+                                   >Dự đoán</a>
+                            {% elif item.Ma_mon_hoc %}
+                                {{ item.Diem_he_10 }}
                             {% endif %}
                         </td>
                         <td>
@@ -81,10 +77,10 @@
                             <input type="hidden" id="maMonHocInput" name="ma_mon_hoc">
                             <input type="hidden" id="diemInput" name="diem">
                             <input type="hidden" id="linhVucInput" name="linh_vuc">
+
                             <p>Mã môn học: <span id="predictedMaMonHoc"></span></p>
+                            <p>Tên môn học: <span id="predictedLinhVuc"></span></p>
                             <p>Điểm: <span id="predictedDiem"></span></p>
-                            <p>Mã môn tiên quyết: <span id="predictedLinhVuc"></span></p>
-                            <p>Tên môn tiên quyết: <span id="tenlinhVuc"></p>
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary">Gửi</button>
